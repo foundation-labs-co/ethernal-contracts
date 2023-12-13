@@ -1,0 +1,106 @@
+// SPDX-License-Identifier: MIT
+
+pragma solidity 0.8.19;
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "../interfaces/IVault.sol";
+import "../interfaces/IERC20Token.sol";
+import "../interfaces/IEthernalToken.sol";
+
+contract VaultEthernal is IVault, Ownable {
+    uint64 public override chainId;
+    uint256 public override tokenIndex;
+    address public override reserveToken;
+    uint256 public override minDeposit;
+    uint256 public reserveTokenIndex;
+    address public ethernalToken;
+    address public controller;
+
+    modifier onlyController() {
+        require(controller == msg.sender, "onlyController: caller is not the controller" );
+        _;
+    }
+
+    event Deposit(address indexed from, uint256 amount);
+    event Withdraw(address indexed to, uint256 amount);
+    event SetController(address indexed controller);
+    event SetMinDeposit(uint256 minDeposit);
+
+    constructor(uint256 _tokenIndex, address _reserveToken, uint256 _minDeposit, uint256 _reserveTokenIndex, address _ethernalToken) {
+        require(_reserveToken != address(0), "invalid address");
+        require(_ethernalToken != address(0), "invalid address");
+
+        chainId = uint64(block.chainid);
+        tokenIndex = _tokenIndex;
+        reserveToken = _reserveToken;
+        minDeposit = _minDeposit;
+        reserveTokenIndex = _reserveTokenIndex;
+        ethernalToken = _ethernalToken;
+    }
+
+    /**
+     * @dev Call from EthernalBridge.send()
+     * @param _from sender address
+     * @param _amount amount of EthernalToken
+     */
+    function deposit(address _from, uint256 _amount) external override onlyController {
+        uint256 balance = IERC20(ethernalToken).balanceOf(address(this));
+        require(balance >= _amount, "insufficient amount");
+
+        // unwrap
+        uint256 reserveAmount = IEthernalToken(ethernalToken).ethernalToReserveAmount(_amount);
+        IEthernalToken(ethernalToken).withdraw(reserveAmount);
+
+        uint256 reserveBalance = IERC20(reserveToken).balanceOf(address(this));
+        require(reserveAmount > minDeposit, "amount too small");
+        require(reserveBalance >= reserveAmount, "insufficient amount");
+
+        // burn
+        IERC20Token(reserveToken).burn(address(this), reserveBalance);
+
+        emit Deposit(_from, _amount);
+    }
+
+    /**
+     * @dev Call from EthernalBridge.receiving()
+     * @param _to receiver address
+     * @param _amount amount of ReserveToken
+     */
+    function withdraw(address _to, uint256 _amount) external override onlyController {
+        // mint
+        IERC20Token(reserveToken).mint(address(this), _amount);
+
+        // deposit
+        uint256 balance = IERC20(ethernalToken).balanceOf(address(this));
+        IEthernalToken(ethernalToken).deposit(_amount);
+        uint256 ethernalAmount = IERC20(ethernalToken).balanceOf(address(this)) - balance;
+        IERC20(ethernalToken).transfer(_to, ethernalAmount);
+
+        emit Withdraw(_to, _amount);
+    }
+
+    function totalBalance() external override view returns (uint256) {
+        return IERC20(reserveToken).balanceOf(address(this));
+    }
+
+    function supportTokenIndex(uint256 _tokenIndex) external override view returns (bool) {
+        return (tokenIndex == _tokenIndex) || (reserveTokenIndex == _tokenIndex);
+    }
+
+    // ------------------------------
+    // onlyOwner
+    // ------------------------------
+    function setController(address _controller) public onlyOwner() {
+        require(_controller != address(0), "invalid address");
+        controller = _controller;
+
+        emit SetController(_controller);
+    }
+
+    function setMinDeposit(uint256 _minDeposit) public onlyOwner() {
+        minDeposit = _minDeposit;
+
+        emit SetMinDeposit(_minDeposit);
+    }
+}
