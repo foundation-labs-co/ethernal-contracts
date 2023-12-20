@@ -15,6 +15,7 @@ contract VaultVenus is IVaultETH, Ownable, Pausable {
     uint256 public override minDeposit;
     address public ibToken;
     address public controller;
+    mapping (uint256 => bool) public supportTokenIndexes;
 
     modifier onlyController() {
         require(controller == msg.sender, "onlyController: caller is not the controller" );
@@ -26,6 +27,7 @@ contract VaultVenus is IVaultETH, Ownable, Pausable {
     event SetController(address indexed controller);
     event SetMinDeposit(uint256 minDeposit);
     event SetDepositPause(bool depositPause);
+    event SetSupportTokenIndex(uint256 indexed tokenIndex, bool flag);
 
     receive() external payable {}
 
@@ -45,6 +47,9 @@ contract VaultVenus is IVaultETH, Ownable, Pausable {
         reserveToken = _reserveToken;
         minDeposit = _minDeposit;
         ibToken = _ibToken;
+
+        // default support tokenIndex
+        supportTokenIndexes[_tokenIndex] = true;
     }
 
     /**
@@ -83,7 +88,7 @@ contract VaultVenus is IVaultETH, Ownable, Pausable {
     }
 
     function supportTokenIndex(uint256 _tokenIndex) external override view returns (bool) {
-        return tokenIndex == _tokenIndex;
+        return supportTokenIndexes[_tokenIndex];
     }
 
     function depositPause() external override view returns (bool) {
@@ -114,5 +119,11 @@ contract VaultVenus is IVaultETH, Ownable, Pausable {
         }
 
         emit SetDepositPause(_flag);
+    }
+
+    function setSupportTokenIndex(uint256 _tokenIndex, bool _flag) external onlyOwner() {
+        supportTokenIndexes[_tokenIndex] = _flag;
+
+        emit SetSupportTokenIndex(_tokenIndex, _flag);
     }
 }

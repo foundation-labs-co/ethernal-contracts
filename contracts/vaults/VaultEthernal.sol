@@ -17,6 +17,7 @@ contract VaultEthernal is IVault, Ownable, Pausable {
     uint256 public reserveTokenIndex;
     address public ethernalToken;
     address public controller;
+    mapping (uint256 => bool) public supportTokenIndexes;
 
     modifier onlyController() {
         require(controller == msg.sender, "onlyController: caller is not the controller" );
@@ -28,6 +29,7 @@ contract VaultEthernal is IVault, Ownable, Pausable {
     event SetController(address indexed controller);
     event SetMinDeposit(uint256 minDeposit);
     event SetDepositPause(bool depositPause);
+    event SetSupportTokenIndex(uint256 indexed tokenIndex, bool flag);
 
     /**
      * @dev Constructor
@@ -47,6 +49,9 @@ contract VaultEthernal is IVault, Ownable, Pausable {
         minDeposit = _minDeposit;
         reserveTokenIndex = _reserveTokenIndex;
         ethernalToken = _ethernalToken;
+
+        // default support tokenIndex
+        supportTokenIndexes[_tokenIndex] = true;
     }
 
     /**
@@ -95,7 +100,7 @@ contract VaultEthernal is IVault, Ownable, Pausable {
     }
 
     function supportTokenIndex(uint256 _tokenIndex) external override view returns (bool) {
-        return (tokenIndex == _tokenIndex) || (reserveTokenIndex == _tokenIndex);
+        return supportTokenIndexes[_tokenIndex];
     }
 
     function depositPause() external override view returns (bool) {
@@ -126,5 +131,11 @@ contract VaultEthernal is IVault, Ownable, Pausable {
         }
         
         emit SetDepositPause(_flag);
+    }
+
+    function setSupportTokenIndex(uint256 _tokenIndex, bool _flag) external onlyOwner() {
+        supportTokenIndexes[_tokenIndex] = _flag;
+
+        emit SetSupportTokenIndex(_tokenIndex, _flag);
     }
 }

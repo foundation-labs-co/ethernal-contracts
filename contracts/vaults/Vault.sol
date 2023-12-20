@@ -14,6 +14,7 @@ contract VaultMintable is IVault, Ownable, Pausable {
     address public override reserveToken;
     uint256 public override minDeposit;
     address public controller;
+    mapping (uint256 => bool) public supportTokenIndexes;
 
     modifier onlyController() {
         require(controller == msg.sender, "onlyController: caller is not the controller" );
@@ -25,6 +26,7 @@ contract VaultMintable is IVault, Ownable, Pausable {
     event SetController(address indexed controller);
     event SetMinDeposit(uint256 minDeposit);
     event SetDepositPause(bool depositPause);
+    event SetSupportTokenIndex(uint256 indexed tokenIndex, bool flag);
 
     /**
      * @dev Constructor
@@ -39,6 +41,9 @@ contract VaultMintable is IVault, Ownable, Pausable {
         tokenIndex = _tokenIndex;
         reserveToken = _reserveToken;
         minDeposit = _minDeposit;
+
+        // default support tokenIndex
+        supportTokenIndexes[_tokenIndex] = true;
     }
 
     /**
@@ -74,7 +79,7 @@ contract VaultMintable is IVault, Ownable, Pausable {
     }
 
     function supportTokenIndex(uint256 _tokenIndex) external override view returns (bool) {
-        return tokenIndex == _tokenIndex;
+        return supportTokenIndexes[_tokenIndex];
     }
 
     function depositPause() external override view returns (bool) {
@@ -105,5 +110,11 @@ contract VaultMintable is IVault, Ownable, Pausable {
         }
         
         emit SetDepositPause(_flag);
+    }
+
+    function setSupportTokenIndex(uint256 _tokenIndex, bool _flag) external onlyOwner() {
+        supportTokenIndexes[_tokenIndex] = _flag;
+
+        emit SetSupportTokenIndex(_tokenIndex, _flag);
     }
 }
