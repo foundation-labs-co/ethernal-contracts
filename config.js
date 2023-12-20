@@ -88,7 +88,7 @@ const config = {
       tokenName: 'eth',
       minDeposit: toWei(`0.001`),
       reserveTokenIndex: tokenIndexs.ETH,
-      ethernalTokenName: 'eusdt',
+      ethernalTokenName: 'eeth',
     },
     {
       type: 'VaultEthernal',

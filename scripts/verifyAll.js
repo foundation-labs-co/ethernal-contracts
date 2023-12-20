@@ -100,6 +100,8 @@ function makeParameter(name) {
       vaultToken.reserveTokenIndex,
       getContractAddress(vaultToken.ethernalTokenName),
     ]
+  } else if (name == 'EthernalReader') {
+    param = []
   }
 
   if (param.length != 0) {

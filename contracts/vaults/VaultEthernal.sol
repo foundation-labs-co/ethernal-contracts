@@ -4,11 +4,12 @@ pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "../interfaces/IVault.sol";
-import "../interfaces/IERC20Token.sol";
+import "../interfaces/IERC20Mintable.sol";
 import "../interfaces/IEthernalToken.sol";
 
-contract VaultEthernal is IVault, Ownable {
+contract VaultEthernal is IVault, Ownable, Pausable {
     uint64 public override chainId;
     uint256 public override tokenIndex;
     address public override reserveToken;
@@ -26,7 +27,16 @@ contract VaultEthernal is IVault, Ownable {
     event Withdraw(address indexed to, uint256 amount);
     event SetController(address indexed controller);
     event SetMinDeposit(uint256 minDeposit);
+    event SetDepositPause(bool depositPause);
 
+    /**
+     * @dev Constructor
+     * @param _tokenIndex token index for ethernal token
+     * @param _reserveToken reserve token address of ethernal token
+     * @param _minDeposit minimum deposit amount
+     * @param _reserveTokenIndex reserve token index
+     * @param _ethernalToken ethernal token address
+     */
     constructor(uint256 _tokenIndex, address _reserveToken, uint256 _minDeposit, uint256 _reserveTokenIndex, address _ethernalToken) {
         require(_reserveToken != address(0), "invalid address");
         require(_ethernalToken != address(0), "invalid address");
@@ -44,7 +54,7 @@ contract VaultEthernal is IVault, Ownable {
      * @param _from sender address
      * @param _amount amount of EthernalToken
      */
-    function deposit(address _from, uint256 _amount) external override onlyController {
+    function deposit(address _from, uint256 _amount) external override onlyController whenNotPaused {
         uint256 balance = IERC20(ethernalToken).balanceOf(address(this));
         require(balance >= _amount, "insufficient amount");
 
@@ -57,7 +67,7 @@ contract VaultEthernal is IVault, Ownable {
         require(reserveBalance >= reserveAmount, "insufficient amount");
 
         // burn
-        IERC20Token(reserveToken).burn(address(this), reserveBalance);
+        IERC20Mintable(reserveToken).burn(address(this), reserveBalance);
 
         emit Deposit(_from, _amount);
     }
@@ -69,7 +79,7 @@ contract VaultEthernal is IVault, Ownable {
      */
     function withdraw(address _to, uint256 _amount) external override onlyController {
         // mint
-        IERC20Token(reserveToken).mint(address(this), _amount);
+        IERC20Mintable(reserveToken).mint(address(this), _amount);
 
         // deposit
         uint256 balance = IERC20(ethernalToken).balanceOf(address(this));
@@ -88,6 +98,10 @@ contract VaultEthernal is IVault, Ownable {
         return (tokenIndex == _tokenIndex) || (reserveTokenIndex == _tokenIndex);
     }
 
+    function depositPause() external override view returns (bool) {
+        return super.paused();
+    }
+
     // ------------------------------
     // onlyOwner
     // ------------------------------
@@ -102,5 +116,15 @@ contract VaultEthernal is IVault, Ownable {
         minDeposit = _minDeposit;
 
         emit SetMinDeposit(_minDeposit);
+    }
+
+    function setDepositPause(bool _flag) external onlyOwner {
+        if (_flag) {
+            _pause();
+        } else {
+            _unpause();
+        }
+        
+        emit SetDepositPause(_flag);
     }
 }
