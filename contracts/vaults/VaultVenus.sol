@@ -107,7 +107,7 @@ contract VaultVenus is IVault, Ownable, Pausable {
         emit SetMinDeposit(_minDeposit);
     }
 
-    function setDepositPause(bool _flag) external onlyOwner {
+    function setDepositPause(bool _flag) external onlyOwner() {
         if (_flag) {
             _pause();
         } else {
