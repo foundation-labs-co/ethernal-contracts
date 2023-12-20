@@ -27,6 +27,13 @@ contract VaultVenus is IVault, Ownable, Pausable {
     event SetMinDeposit(uint256 minDeposit);
     event SetDepositPause(bool depositPause);
 
+    /**
+     * @dev Constructor
+     * @param _tokenIndex token index for reserve token
+     * @param _reserveToken reserve token address
+     * @param _minDeposit minimum deposit amount
+     * @param _ibToken venus ibToken address
+     */
     constructor(uint256 _tokenIndex, address _reserveToken, uint256 _minDeposit, address _ibToken) {
         require(_reserveToken != address(0), "invalid address");
         require(_ibToken != address(0), "invalid address");

@@ -17,8 +17,8 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
     address public constant ETH_TOKEN = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address public xOracleMessage;
 
-    mapping (address => address) tokenVaults;
-    mapping (uint256 => address) tokenIndexVaults;
+    mapping (address => address) public tokenVaults;
+    mapping (uint256 => address) public tokenIndexVaults;
     mapping (uint64 => address) public ethernalBridgeEndpoints;
 
     // events

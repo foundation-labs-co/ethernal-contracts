@@ -29,6 +29,14 @@ contract VaultEthernal is IVault, Ownable, Pausable {
     event SetMinDeposit(uint256 minDeposit);
     event SetDepositPause(bool depositPause);
 
+    /**
+     * @dev Constructor
+     * @param _tokenIndex token index for ethernal token
+     * @param _reserveToken reserve token address of ethernal token
+     * @param _minDeposit minimum deposit amount
+     * @param _reserveTokenIndex reserve token index
+     * @param _ethernalToken ethernal token address
+     */
     constructor(uint256 _tokenIndex, address _reserveToken, uint256 _minDeposit, uint256 _reserveTokenIndex, address _ethernalToken) {
         require(_reserveToken != address(0), "invalid address");
         require(_ethernalToken != address(0), "invalid address");

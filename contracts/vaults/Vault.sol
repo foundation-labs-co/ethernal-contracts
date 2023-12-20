@@ -26,6 +26,12 @@ contract VaultMintable is IVault, Ownable, Pausable {
     event SetMinDeposit(uint256 minDeposit);
     event SetDepositPause(bool depositPause);
 
+    /**
+     * @dev Constructor
+     * @param _tokenIndex token index for reserve token
+     * @param _reserveToken reserve token address
+     * @param _minDeposit minimum deposit amount
+     */
     constructor(uint256 _tokenIndex, address _reserveToken, uint256 _minDeposit) {
         require(_reserveToken != address(0), "invalid address");
 

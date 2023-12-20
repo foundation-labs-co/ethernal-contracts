@@ -36,7 +36,7 @@ module.exports = {
   networks: {
     hardhat: {
       forking: {
-        url: `https://bsc-dataseed1.binance.org`,
+        url: `https://develop-chain.0xnode.cloud/`,
       },
     },
     bsc: {
