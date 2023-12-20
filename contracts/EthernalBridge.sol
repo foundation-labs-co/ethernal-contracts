@@ -3,6 +3,7 @@
 pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./interfaces/IVault.sol";
@@ -10,14 +11,17 @@ import "./interfaces/IVaultETH.sol";
 import "./interfaces/IXOracleMessage.sol";
 
 contract EthernalBridge is Ownable, ReentrancyGuard {
+    using SafeERC20 for IERC20;
+
     uint64 public chainId;
     address public constant ETH_TOKEN = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address public xOracleMessage;
 
     mapping (address => address) tokenVaults;
     mapping (uint256 => address) tokenIndexVaults;
-    mapping (uint64 => address) public ethernalBridgeAddresses;
+    mapping (uint64 => address) public ethernalBridgeEndpoints;
 
+    // events
     event Send(
         uint256 indexed srcTokenIndex, 
         uint256 indexed dstTokenIndex, 
@@ -59,7 +63,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
         require(_receiver != address(0), "invalid receiver address");
 
         // endpoint
-        address endpoint = ethernalBridgeAddresses[_dstChainId];
+        address endpoint = ethernalBridgeEndpoints[_dstChainId];
         require(endpoint != address(0), "invalid endpoint address");
 
         // lookup vault
@@ -69,7 +73,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
 
         // deposit to vault
         uint256 srcTokenIndex = vault.tokenIndex();
-        IERC20(_token).transferFrom(msg.sender, address(vault), _amount);
+        IERC20(_token).safeTransferFrom(msg.sender, address(vault), _amount);
         vault.deposit(msg.sender, _amount);
 
         // send message
@@ -90,7 +94,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
         require(_receiver != address(0), "invalid receiver address");
 
         // endpoint
-        address endpoint = ethernalBridgeAddresses[_dstChainId];
+        address endpoint = ethernalBridgeEndpoints[_dstChainId];
         require(endpoint != address(0), "invalid endpoint address");
 
         // transfer amount
@@ -178,14 +182,25 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
     function setXOracleMessage(address _xOracleMessage) public onlyOwner() {
         require(_xOracleMessage != address(0), "invalid address");
         xOracleMessage = _xOracleMessage;
-
+        
         emit SetXOracleMessage(_xOracleMessage);
     }
 
     function setEndpoint(uint64 _dstChainId, address _endpoint) public onlyOwner() {
         require(_endpoint != address(0), "invalid address");
-        ethernalBridgeAddresses[_dstChainId] = _endpoint;
+        ethernalBridgeEndpoints[_dstChainId] = _endpoint;
 
         emit SetEndpoint(_dstChainId, _endpoint);
+    }
+
+    // ------------------------------
+    // view function
+    // ------------------------------
+    function getTokenPause(address _token) external view returns (bool) {
+        return IVault(tokenVaults[_token]).depositPause();
+    }
+
+    function getTokenVault(address _token) external view returns (address) {
+        return tokenVaults[_token];
     }
 }

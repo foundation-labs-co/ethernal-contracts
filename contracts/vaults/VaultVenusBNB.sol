@@ -2,12 +2,13 @@
 
 pragma solidity 0.8.19;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "../interfaces/IVaultETH.sol";
 import "../interfaces/IVBNB.sol";
 
-contract VaultVenus is IVaultETH, Ownable {
+contract VaultVenus is IVaultETH, Ownable, Pausable {
     uint64 public override chainId;
     uint256 public override tokenIndex;
     address public override reserveToken;
@@ -24,6 +25,7 @@ contract VaultVenus is IVaultETH, Ownable {
     event Withdraw(address indexed to, uint256 amount);
     event SetController(address indexed controller);
     event SetMinDeposit(uint256 minDeposit);
+    event SetDepositPause(bool depositPause);
 
     receive() external payable {}
 
@@ -43,7 +45,7 @@ contract VaultVenus is IVaultETH, Ownable {
      * @param _from sender address
      * - msg.value is amount of ReserveToken
      */
-    function deposit(address _from) external payable override onlyController {
+    function deposit(address _from) external payable override onlyController whenNotPaused {
         require(msg.value > minDeposit, "amount too small");
 
         // mint
@@ -77,13 +79,17 @@ contract VaultVenus is IVaultETH, Ownable {
         return tokenIndex == _tokenIndex;
     }
 
+    function depositPause() external override view returns (bool) {
+        return super.paused();
+    }
+
     // ------------------------------
     // onlyOwner
     // ------------------------------
     function setController(address _controller) public onlyOwner() {
         require(_controller != address(0), "invalid address");
         controller = _controller;
-
+        
         emit SetController(_controller);
     }
 
@@ -91,5 +97,15 @@ contract VaultVenus is IVaultETH, Ownable {
         minDeposit = _minDeposit;
 
         emit SetMinDeposit(_minDeposit);
+    }
+
+    function setDepositPause(bool _flag) external onlyOwner {
+        if (_flag) {
+            _pause();
+        } else {
+            _unpause();
+        }
+
+        emit SetDepositPause(_flag);
     }
 }

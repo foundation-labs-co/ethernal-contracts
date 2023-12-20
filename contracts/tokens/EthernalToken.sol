@@ -2,14 +2,11 @@
 
 pragma solidity 0.8.19;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-
-interface IERC20Token {
-    function mint(address _account, uint256 _amount) external;
-}
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "../interfaces/IERC20Mintable.sol";
 
 contract EthernalToken is ERC20, Ownable {
     using SafeERC20 for IERC20;
@@ -112,7 +109,7 @@ contract EthernalToken is ERC20, Ownable {
         // mint reserveToken for distribution
         if (balance > reserveBalance()) {
             uint256 _amount = balance - reserveBalance();
-            IERC20Token(reserveToken).mint(address(this), _amount);
+            IERC20Mintable(reserveToken).mint(address(this), _amount);
         }
     }
 
