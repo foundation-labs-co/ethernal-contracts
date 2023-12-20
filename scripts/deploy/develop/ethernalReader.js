@@ -12,16 +12,16 @@ async function main() {
     getContractAddress(`ethernalBridge`),
     '0x881D40237659C251811CEC9c364ef91dC08D300C', // account
     [
-      getContractAddress(`btc`),
-      getContractAddress(`eth`),
-      getContractAddress(`bnb`),
-      getContractAddress(`usdt`),
-      getContractAddress(`usdc`),
       getContractAddress(`ebtc`),
       getContractAddress(`eeth`),
       getContractAddress(`ebnb`),
       getContractAddress(`eusdt`),
       getContractAddress(`eusdc`),
+      getContractAddress(`btc`),
+      getContractAddress(`eth`),
+      getContractAddress(`bnb`),
+      getContractAddress(`usdt`),
+      getContractAddress(`usdc`),
     ]
   )
   console.log(result)

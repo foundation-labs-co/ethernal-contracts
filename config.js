@@ -1,7 +1,7 @@
 const { toWei } = require('./scripts/lib/helper')
 
 const networkId = {
-  lineaTestnet: 59140,
+  bscTestnet: 97,
   develop: 1112,
 }
 
@@ -10,22 +10,22 @@ const tokenIndexs = {
   ETH: 1,
   BNB: 2,
   USDT: 3,
-  BUSD: 4,
+  // BUSD: 4,
   USDC: 5,
   // DAI: 6,
   // XRP: 10,
   // DOGE: 11,
   // TRX: 12,
   // ADA: 20,
-  MATIC: 21,
+  // MATIC: 21,
   // SOL: 22,
   // DOT: 23,
   // AVAX: 24,
   // FTM: 25,
   // NEAR: 26,
   // ATOM: 27,
-  OP: 28,
-  ARB: 29,
+  // OP: 28,
+  // ARB: 29,
 
   // Ethernal Wrap Yield Token
   EBTC: 100,
