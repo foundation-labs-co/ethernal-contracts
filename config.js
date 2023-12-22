@@ -27,7 +27,7 @@ const tokenIndexes = {
   // OP: 28,
   // ARB: 29,
 
-  // Ethernal Wrap Yield Token
+  // Ethernal Passive Yield Token
   EBTC: 100,
   EETH: 101,
   EBNB: 102,
@@ -36,6 +36,50 @@ const tokenIndexes = {
 }
 
 const config = {
+  chains: {},
+}
+
+config.chains[networkId.bscTestnet] = {
+  vaultTokens: [
+    {
+      type: 'VaultVenus',
+      name: 'BTC',
+      tokenIndex: tokenIndexes.BTC,
+      tokenName: 'btc',
+      minDeposit: toWei(`0.00005`),
+    },
+    {
+      type: 'VaultVenus',
+      name: 'ETH',
+      tokenIndex: tokenIndexes.ETH,
+      tokenName: 'eth',
+      minDeposit: toWei(`0.001`),
+    },
+    {
+      type: 'VaultVenusBNB',
+      name: 'BNB',
+      tokenIndex: tokenIndexes.BNB,
+      tokenName: 'bnb',
+      minDeposit: toWei(`0.008`),
+    },
+    {
+      type: 'VaultVenus',
+      name: 'USDT',
+      tokenIndex: tokenIndexes.USDT,
+      tokenName: 'usdt',
+      minDeposit: toWei(`1`),
+    },
+    {
+      type: 'VaultVenus',
+      name: 'USDC',
+      tokenIndex: tokenIndexes.USDC,
+      tokenName: 'usdc',
+      minDeposit: toWei(`1`),
+    },
+  ],
+}
+
+config.chains[networkId.develop] = {
   vaultTokens: [
     {
       type: 'VaultMintable',

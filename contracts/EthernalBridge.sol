@@ -34,6 +34,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
     mapping (address => address) public tokenVaults;
     mapping (uint256 => address) public tokenIndexVaults;
     mapping (uint64 => address) public ethernalBridgeEndpoints;
+    mapping (uint64 => mapping(uint256 => bool)) public supportDstTokenIndexes;
 
     mapping (uint256 => UserBridge) public outgoingBridges; // uid => UserBridge
     mapping (uint256 => mapping (uint256 => UserBridge)) public incomingBridges; // srcChainId => uid => UserBridge
@@ -73,6 +74,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
     event RemoveAllowToken(address indexed token, uint256 indexed tokenIndex);
     event SetXOracleMessage(address indexed xOracleMessage);
     event SetEndpoint(uint64 indexed dstChainId, address indexed endpoint);
+    event SetSupportDstTokenIndex(uint64 indexed dstChainId, uint256 indexed tokenIndex, bool support);
 
     constructor() {
         chainId = uint64(block.chainid);
@@ -98,7 +100,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
         // lookup vault
         IVault vault = IVault(tokenVaults[_token]);
         require(address(vault) != address(0), "token not allowed");
-        require(vault.supportTokenIndex(_dstTokenIndex), "tokenIndex not allowed");
+        require(getSupportDstTokenIndex(_dstChainId, _dstTokenIndex), "dstTokenIndex not allowed");
 
         // deposit to vault
         uint256 srcTokenIndex = vault.tokenIndex();
@@ -147,7 +149,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
         // lookup vault
         IVaultETH vault = IVaultETH(tokenVaults[ETH_TOKEN]);
         require(address(vault) != address(0), "token not allowed");
-        require(vault.supportTokenIndex(_dstTokenIndex), "tokenIndex not allowed");
+        require(getSupportDstTokenIndex(_dstChainId, _dstTokenIndex), "dstTokenIndex not allowed");
 
         // deposit ETH to vault
         uint256 srcTokenIndex = vault.tokenIndex();
@@ -232,6 +234,10 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
     // ------------------------------
     // onlyOwner
     // ------------------------------
+    /**
+     * @dev Admin refund outgoing bridge
+     * @param _uid uid
+     */
     function adminRefund(uint64 _uid) external onlyOwner {
         UserBridge memory userBridge = outgoingBridges[_uid];
         require(userBridge.uid == _uid, "uid not found");
@@ -288,6 +294,12 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
         emit SetEndpoint(_dstChainId, _endpoint);
     }
 
+    function setSupportDstTokenIndex(uint64 _dstChainId, uint256 _tokenIndex, bool _support) external onlyOwner() {
+        supportDstTokenIndexes[_dstChainId][_tokenIndex] = _support;
+
+        emit SetSupportDstTokenIndex(_dstChainId, _tokenIndex, _support);
+    }
+
     // ------------------------------
     // view function
     // ------------------------------
@@ -297,6 +309,10 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
 
     function getTokenVault(address _token) external view returns (address) {
         return tokenVaults[_token];
+    }
+
+    function getSupportDstTokenIndex(uint64 _dstChainId, uint256 _tokenIndex) public view returns (bool) {
+        return supportDstTokenIndexes[_dstChainId][_tokenIndex];
     }
 
     function getOutgoingBridge(uint256 _uid) external view returns (

@@ -10,6 +10,5 @@ interface IVaultETH {
     function chainId() external view returns (uint64);
     function tokenIndex() external view returns (uint256);
     function minDeposit() external view returns (uint256);
-    function supportTokenIndex(uint256 tokenIndex) external view returns (bool);
     function depositPause() external view returns (bool);
 }
