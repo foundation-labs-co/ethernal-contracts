@@ -330,7 +330,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
     }
 
     function getBridgeFee(uint64 _dstChainId) public view returns (uint256) {
-        return IXOracleMessage(xOracleMessage).getFee(chainId, _dstChainId);
+        return IXOracleMessage(xOracleMessage).getFee(_dstChainId);
     }
 
     function getOutgoingBridge(uint256 _uid) external view returns (
