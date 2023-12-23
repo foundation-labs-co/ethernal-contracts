@@ -66,7 +66,6 @@ contract EthernalToken is ERC20, Ownable {
         // update balance
         balance = balance + _amount;
 
-        // wrap
         // mint this token to msg.sender
         _mint(msg.sender, _balance);
 
@@ -88,7 +87,6 @@ contract EthernalToken is ERC20, Ownable {
         require(_balance >= minAmount, "amount must higher than min amount");
         require(_balance <= maxAmount, "amount must lower than max amount");
 
-        // unwrap
         // burn this token from msg.sender
         _burn(msg.sender, _amount);
 

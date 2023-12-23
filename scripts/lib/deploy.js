@@ -133,6 +133,7 @@ module.exports = {
   getContractAddress,
   deployContract,
   contractAt,
+  getChainId,
   getFrameSigner,
   writeTmpAddresses,
   readTmpAddresses,

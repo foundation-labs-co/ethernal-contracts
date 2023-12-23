@@ -40,7 +40,7 @@ const config = {
 }
 
 config.chains[networkId.bscTestnet] = {
-  xOracleMessage: '',
+  xOracleMessage: '0x1b404D1491e488001A8545b86E58ac8362D0E95C',
   ethernalBridge: '',
   vaultTokens: [
     {
@@ -82,7 +82,7 @@ config.chains[networkId.bscTestnet] = {
 }
 
 config.chains[networkId.develop] = {
-  xOracleMessage: '',
+  xOracleMessage: '0x1b404D1491e488001A8545b86E58ac8362D0E95C',
   ethernalBridge: '',
   vaultTokens: [
     {

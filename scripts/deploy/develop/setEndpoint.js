@@ -14,8 +14,8 @@ async function main() {
     const dstChainId = dstChains[i]
     const endpoint = config.chains[dstChainId].ethernalBridge
     await sendTxn(
-      ethernalBridge.setEndpoint(dstChain, endpoint),
-      `ethernalBridge.setEndpoint(${dstChain}, ${endpoint})`
+      ethernalBridge.setEndpoint(dstChainId, endpoint),
+      `ethernalBridge.setEndpoint(${dstChainId}, ${endpoint})`
     )
   }
 }

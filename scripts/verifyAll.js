@@ -1,14 +1,15 @@
 const network = process.env.HARDHAT_NETWORK || 'mainnet'
-const { deployedAddress, getContractAddress } = require('./lib/deploy')
+const { deployedAddress, getContractAddress, getChainId } = require('./lib/deploy')
 const { config } = require('../config')
 const { exec } = require('child_process')
 
 let isDone = false
 let errors = []
+const chainId = getChainId(network)
 
 function getVaultTokenByName(name) {
-  for (let i = 0; i < config.vaultTokens.length; i++) {
-    const vaultToken = config.vaultTokens[i]
+  for (let i = 0; i < config.chains[chainId].vaultTokens.length; i++) {
+    const vaultToken = config.chains[chainId].vaultTokens[i]
     if (vaultToken.name == name) {
       return vaultToken
     }
@@ -19,27 +20,27 @@ function getVaultTokenByName(name) {
 function makeParameter(name) {
   var param = []
   if (name == 'BTC') {
-    param = ['Ethernal-Peg BTC Token', 'BTC']
+    param = ['BTC (Ethernal)', 'BTC']
   } else if (name == 'ETH') {
-    param = ['Ethernal-Peg ETH Token', 'ETH']
+    param = ['ETH (Ethernal)', 'ETH']
   } else if (name == 'BNB') {
-    param = ['Ethernal-Peg BNB Token', 'BNB']
+    param = ['BNB  (Ethernal)', 'BNB']
   } else if (name == 'USDT') {
-    param = ['Ethernal-Peg USDT Token', 'USDT']
+    param = ['USDT (Ethernal)', 'USDT']
   } else if (name == 'USDC') {
-    param = ['Ethernal-Peg USDC Token', 'USDC']
+    param = ['USDC (Ethernal)', 'USDC']
   } else if (name == 'EBTC') {
-    param = ['Ethernal Wrapped Yield BTC', 'EBTC', getContractAddress('btc')]
+    param = ['Ethernal Passive Yield BTC', 'EBTC', getContractAddress('btc')]
   } else if (name == 'EETH') {
-    param = ['Ethernal Wrapped Yield ETH', 'EETH', getContractAddress('eth')]
+    param = ['Ethernal Passive Yield ETH', 'EETH', getContractAddress('eth')]
   } else if (name == 'EBNB') {
-    param = ['Ethernal Wrapped Yield BNB', 'EBNB', getContractAddress('bnb')]
+    param = ['Ethernal Passive Yield BNB', 'EBNB', getContractAddress('bnb')]
   } else if (name == 'EUSDT') {
-    param = ['Ethernal Wrapped Yield USDT', 'EUSDT', getContractAddress('usdt')]
+    param = ['Ethernal Passive Yield USDT', 'EUSDT', getContractAddress('usdt')]
   } else if (name == 'EUSDC') {
-    param = ['Ethernal Wrapped Yield USDC', 'EUSDC', getContractAddress('usdc')]
+    param = ['Ethernal Passive Yield USDC', 'EUSDC', getContractAddress('usdc')]
   } else if (name == 'EthernalBridge') {
-    param = []
+    param = [config.chains[chainId].xOracleMessage]
   } else if (name == 'VaultMintable BTC') {
     vaultToken = getVaultTokenByName('BTC')
     param = [vaultToken.tokenIndex, getContractAddress(vaultToken.tokenName), vaultToken.minDeposit]
