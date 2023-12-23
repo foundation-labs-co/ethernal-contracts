@@ -8,7 +8,12 @@ async function main() {
   const dstChains = [networkId.bscTestnet]
 
   // deploy EthernalBridge
-  const ethernalBridge = await deployContract('EthernalBridge', [], 'EthernalBridge', deployer)
+  const ethernalBridge = await deployContract(
+    'EthernalBridge',
+    [config.chains[srcChain].xOracleMessage],
+    'EthernalBridge',
+    deployer
+  )
 
   // deploy Vaults
   for (let i = 0; i < config.chains[srcChain].vaultTokens.length; i++) {

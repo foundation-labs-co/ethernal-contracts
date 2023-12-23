@@ -31,11 +31,11 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
     address public xOracleMessage;
     uint256 public uid; // uid counter for outgoing, start with 1
     
-    mapping (address => address) public tokenVaults;
-    mapping (uint256 => address) public tokenIndexVaults;
-    mapping (uint64 => address) public ethernalBridgeEndpoints;
-    mapping (uint64 => mapping(uint256 => bool)) public supportDstTokenIndexes;
-
+    mapping (address => address) public tokenVaults; // token => vault
+    mapping (uint256 => address) public tokenIndexVaults; // tokenIndex => vault
+    mapping (uint64 => address) public ethernalBridgeEndpoints; // dstChainId => endpoint
+    mapping (uint64 => mapping(uint256 => bool)) public supportDstTokenIndexes; // dstChainId => tokenIndex => support
+    
     mapping (uint256 => UserBridge) public outgoingBridges; // uid => UserBridge
     mapping (uint256 => mapping (uint256 => UserBridge)) public incomingBridges; // srcChainId => uid => UserBridge
 
@@ -76,8 +76,11 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
     event SetEndpoint(uint64 indexed dstChainId, address indexed endpoint);
     event SetSupportDstTokenIndex(uint64 indexed dstChainId, uint256 indexed tokenIndex, bool support);
 
-    constructor() {
+    constructor(address _xOracleMessage) {
+        require(_xOracleMessage != address(0), "invalid address");
+
         chainId = uint64(block.chainid);
+        xOracleMessage = _xOracleMessage;
     }
 
     /**
@@ -88,10 +91,14 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
      * @param _dstTokenIndex destination tokenIndex
      * @param _receiver receiver address
      */
-    function send(address _token, uint256 _amount, uint64 _dstChainId, uint256 _dstTokenIndex, address _receiver) external nonReentrant {
+    function send(address _token, uint256 _amount, uint64 _dstChainId, uint256 _dstTokenIndex, address _receiver) external payable nonReentrant {
         require(_token != address(0), "invalid token address");
         require(_dstChainId != chainId, "invalid chainId");
         require(_receiver != address(0), "invalid receiver address");
+
+        // check fee
+        uint256 fee = getBridgeFee(_dstChainId);
+        require(msg.value >= fee, "insufficient fee");
 
         // endpoint
         address endpoint = ethernalBridgeEndpoints[_dstChainId];
@@ -124,7 +131,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
 
         // send message
         bytes memory payload = abi.encode(srcTokenIndex, _dstTokenIndex, _amount, chainId, _dstChainId, msg.sender, _receiver);
-        IXOracleMessage(xOracleMessage).sendMessage(payload, endpoint, _dstChainId);
+        IXOracleMessage(xOracleMessage).sendMessage{ value: msg.value }(payload, endpoint, _dstChainId);
 
         emit Send(uid, srcTokenIndex, _dstTokenIndex, _amount, chainId, _dstChainId, msg.sender, _receiver);
     }
@@ -139,12 +146,19 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
         require(_dstChainId != chainId, "invalid chainId");
         require(_receiver != address(0), "invalid receiver address");
 
+        // transfer amount
+        uint256 amount = msg.value;
+
+        // check fee
+        uint256 fee = getBridgeFee(_dstChainId);
+        if (fee > 0) {
+            require(amount > fee, "insufficient fee");
+            amount = amount - fee;
+        }
+
         // endpoint
         address endpoint = ethernalBridgeEndpoints[_dstChainId];
         require(endpoint != address(0), "invalid endpoint address");
-
-        // transfer amount
-        uint256 amount = msg.value;
 
         // lookup vault
         IVaultETH vault = IVaultETH(tokenVaults[ETH_TOKEN]);
@@ -172,7 +186,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
 
         // send message
         bytes memory payload = abi.encode(uid, srcTokenIndex, _dstTokenIndex, amount, chainId, _dstChainId, msg.sender, _receiver);
-        IXOracleMessage(xOracleMessage).sendMessage(payload, endpoint, _dstChainId);
+        IXOracleMessage(xOracleMessage).sendMessage{ value: fee }(payload, endpoint, _dstChainId);
 
         emit Send(uid, srcTokenIndex, _dstTokenIndex, amount, chainId, _dstChainId, msg.sender, _receiver);
     }
@@ -313,6 +327,10 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
 
     function getSupportDstTokenIndex(uint64 _dstChainId, uint256 _tokenIndex) public view returns (bool) {
         return supportDstTokenIndexes[_dstChainId][_tokenIndex];
+    }
+
+    function getBridgeFee(uint64 _dstChainId) public view returns (uint256) {
+        return IXOracleMessage(xOracleMessage).getFee(chainId, _dstChainId);
     }
 
     function getOutgoingBridge(uint256 _uid) external view returns (

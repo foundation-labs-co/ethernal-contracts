@@ -40,6 +40,8 @@ const config = {
 }
 
 config.chains[networkId.bscTestnet] = {
+  xOracleMessage: '',
+  ethernalBridge: '',
   vaultTokens: [
     {
       type: 'VaultVenus',
@@ -80,6 +82,8 @@ config.chains[networkId.bscTestnet] = {
 }
 
 config.chains[networkId.develop] = {
+  xOracleMessage: '',
+  ethernalBridge: '',
   vaultTokens: [
     {
       type: 'VaultMintable',
