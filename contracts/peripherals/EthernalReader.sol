@@ -6,13 +6,16 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "hardhat/console.sol";
 
 interface IEthernalBridge {
-    function getTokenPause(address _token) external view returns(bool);
-    function getTokenVault(address _token) external view returns(address);
+    function getTokenPause(address token) external view returns(bool);
+    function getTokenVault(address token) external view returns(address);
+    function getTokenIndexVault(uint256 tokenIndex) external view returns(address);
 }
 
 interface IVault {
     function tokenIndex() external view returns(uint256);
-    function reserveToken() external view returns (address);
+    function reserveToken() external view returns(address);
+    function minDeposit() external view returns(uint256);
+    function depositPause() external view returns(bool);
 }
 
 interface IVaultEthernal {
@@ -22,11 +25,11 @@ interface IVaultEthernal {
 interface IEthernalToken {
     function interestPerBlock() external view returns(uint256);
     function blockPerYear() external view returns(uint256);
-    function ethernalToReserveAmount(uint256 amount) external view returns (uint256);
+    function ethernalToReserveAmount(uint256 amount) external view returns(uint256);
 }
 
 contract EthernalReader {
-    struct TokenInfo {
+    struct UserTokenInfo {
         address token; // token address
         uint256 tokenIndex; // token index
         uint256 balance; // user balance
@@ -39,8 +42,10 @@ contract EthernalReader {
         uint256 reserveBalance; // reserve balance for ethernal token
     }
 
-    function getUserTokenInfo(address _ethernalBridge, address _account, address[] memory _tokens) external view returns(TokenInfo[] memory) {
-        TokenInfo[] memory tokenInfos = new TokenInfo[](_tokens.length);
+    address public constant ETH_TOKEN = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+
+    function getUserTokenInfo(address _ethernalBridge, address _account, address[] memory _tokens) external view returns(UserTokenInfo[] memory) {
+        UserTokenInfo[] memory userTokenInfos = new UserTokenInfo[](_tokens.length);
         for (uint256 i = 0; i < _tokens.length; i++) {
             address token = _tokens[i];
 
@@ -63,7 +68,7 @@ contract EthernalReader {
                 reserveBalance = IEthernalToken(ethernalToken).ethernalToReserveAmount(balance);
             }
             
-            tokenInfos[i] = TokenInfo({
+            userTokenInfos[i] = UserTokenInfo({
                 token: token,
                 tokenIndex: tokenIndex,
                 balance: balance,
@@ -75,6 +80,31 @@ contract EthernalReader {
             });
         }
 
-        return tokenInfos;
+        return userTokenInfos;
+    }
+
+    function getTokenInfo(address _ethernalBridge, address _token) public view returns(
+        uint256 minAmount,
+        bool isPause,
+        bool isEthernalToken,
+        uint256 apr,
+        uint256 exchangeRate
+    ) {
+        // get vault
+        address vault = IEthernalBridge(_ethernalBridge).getTokenVault(_token);
+        minAmount = IVault(vault).minDeposit();
+        isPause = IVault(vault).depositPause();
+
+        // check if reserveToken != token, it's ethernal token
+        isEthernalToken = IVault(vault).reserveToken() != _token;
+        exchangeRate = 1;
+
+        if (isEthernalToken) {
+            address ethernalToken = IVaultEthernal(vault).ethernalToken();
+            // precision 18 decimals
+            apr = IEthernalToken(ethernalToken).interestPerBlock() * IEthernalToken(ethernalToken).blockPerYear();
+            // get exchange rate
+            exchangeRate = IEthernalToken(ethernalToken).ethernalToReserveAmount(1e18);
+        }
     }
 }
