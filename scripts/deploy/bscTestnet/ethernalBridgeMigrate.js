@@ -4,8 +4,8 @@ const { networkId, config } = require('../../../config')
 async function main() {
   let deployer = await getFrameSigner()
 
-  const srcChain = networkId.develop
-  const dstChains = [networkId.bscTestnet]
+  const srcChain = networkId.bscTestnet
+  const dstChains = [networkId.develop]
 
   // deploy new EthernalBridge
   const ethernalBridge = await deployContract(

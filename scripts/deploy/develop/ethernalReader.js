@@ -8,23 +8,30 @@ async function main() {
   // const ethernalReader = await contractAt('EthernalReader', getContractAddress(`ethernalReader`), deployer)
 
   // test reader
-  const result = await ethernalReader.getUserTokenInfo(
+  const tokens = [
+    getContractAddress(`ebtc`),
+    getContractAddress(`eeth`),
+    getContractAddress(`ebnb`),
+    getContractAddress(`eusdt`),
+    getContractAddress(`eusdc`),
+    getContractAddress(`btc`),
+    getContractAddress(`eth`),
+    getContractAddress(`bnb`),
+    getContractAddress(`usdt`),
+    getContractAddress(`usdc`),
+  ]
+
+  let result = await ethernalReader.getUserTokenInfo(
     getContractAddress(`ethernalBridge`),
     '0x881D40237659C251811CEC9c364ef91dC08D300C', // account
-    [
-      getContractAddress(`ebtc`),
-      getContractAddress(`eeth`),
-      getContractAddress(`ebnb`),
-      getContractAddress(`eusdt`),
-      getContractAddress(`eusdc`),
-      getContractAddress(`btc`),
-      getContractAddress(`eth`),
-      getContractAddress(`bnb`),
-      getContractAddress(`usdt`),
-      getContractAddress(`usdc`),
-    ]
+    tokens
   )
   console.log(result)
+
+  for (let i = 0; i < tokens.length; i++) {
+    result = await ethernalReader.getTokenInfo(getContractAddress(`ethernalBridge`), tokens[i])
+    console.log(result)
+  }
 }
 
 main()

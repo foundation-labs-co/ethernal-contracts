@@ -27,6 +27,11 @@ const contactAddress = {
   vaultEBNB: deployedAddress['VaultEthernal EBNB'],
   vaultEUSDT: deployedAddress['VaultEthernal EUSDT'],
   vaultEUSDC: deployedAddress['VaultEthernal EUSDC'],
+  vaultVenusBTC: deployedAddress['VaultVenus BTC'],
+  vaultVenusETH: deployedAddress['VaultVenus ETH'],
+  vaultVenusBNB: deployedAddress['VaultVenusBNB BNB'],
+  vaultVenusUSDT: deployedAddress['VaultVenus USDT'],
+  vaultVenusUSDC: deployedAddress['VaultVenus USDC'],
   ethernalBridge: deployedAddress['EthernalBridge'],
   ethernalReader: deployedAddress['EthernalReader'],
 }

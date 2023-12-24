@@ -4,7 +4,7 @@ const { networkId, config } = require('../../../config')
 async function main() {
   let deployer = await getFrameSigner()
 
-  const srcChain = networkId.develop
+  const srcChain = networkId.bscTestnet
 
   // set tokens
   for (let i = 0; i < config.chains[srcChain].vaultTokens.length; i++) {
@@ -12,7 +12,7 @@ async function main() {
     
     if (vaultToken.type == 'VaultVenus') {
       const token = await contractAt('ERC20Token', getContractAddress(vaultToken.tokenName), deployer)
-      const vault = getContractAddress(`vault${vaultToken.name}`)
+      const vault = getContractAddress(`vaultVenus${vaultToken.name}`)
       const ibToken = vaultToken.ibToken
 
       // set controller
