@@ -309,6 +309,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
     }
 
     function setSupportDstTokenIndex(uint64 _dstChainId, uint256 _tokenIndex, bool _support) external onlyOwner() {
+        require(_dstChainId != chainId, "invalid chainId");
         supportDstTokenIndexes[_dstChainId][_tokenIndex] = _support;
 
         emit SetSupportDstTokenIndex(_dstChainId, _tokenIndex, _support);
