@@ -10,7 +10,7 @@ import "../interfaces/IERC20Mintable.sol";
 import "../interfaces/IEthernalToken.sol";
 
 contract VaultEthernal is IVault, Ownable, Pausable {
-    uint64 public override chainId;
+    uint64 public immutable override chainId;
     uint256 public override tokenIndex;
     address public override reserveToken;
     uint256 public override minDeposit;
@@ -93,11 +93,11 @@ contract VaultEthernal is IVault, Ownable, Pausable {
         emit Withdraw(_to, _amount);
     }
 
-    function totalBalance() external override view returns (uint256) {
+    function totalBalance() external override view returns(uint256) {
         return IERC20(reserveToken).balanceOf(address(this));
     }
 
-    function depositPause() external override view returns (bool) {
+    function depositPause() external override view returns(bool) {
         return super.paused();
     }
 

@@ -55,3 +55,7 @@ Thumbs.db
 # .env
 .env
 .env_bk
+
+# mock contracts
+contracts/mock/VToken.sol
+contracts/mock/VBNB.sol

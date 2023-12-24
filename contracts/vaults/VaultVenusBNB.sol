@@ -8,8 +8,8 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "../interfaces/IVaultETH.sol";
 import "../interfaces/IVBNB.sol";
 
-contract VaultVenus is IVaultETH, Ownable, Pausable {
-    uint64 public override chainId;
+contract VaultVenusBNB is IVaultETH, Ownable, Pausable {
+    uint64 public immutable override chainId;
     uint256 public override tokenIndex;
     address public override reserveToken;
     uint256 public override minDeposit;
@@ -78,11 +78,11 @@ contract VaultVenus is IVaultETH, Ownable, Pausable {
         emit Withdraw(_to, _amount);
     }
 
-    function totalBalance() external override view returns (uint256) {
+    function totalBalance() external override view returns(uint256) {
         return IERC20(reserveToken).balanceOf(address(this));
     }
 
-    function depositPause() external override view returns (bool) {
+    function depositPause() external override view returns(bool) {
         return super.paused();
     }
 

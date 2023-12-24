@@ -114,16 +114,16 @@ contract EthernalToken is ERC20, Ownable {
     // ------------------------------
     // view
     // ------------------------------
-    function distributionBalance() public view returns (uint256) {
+    function distributionBalance() public view returns(uint256) {
         uint256 _interest = (balance * (block.number - lastBlock) * interestPerBlock) / 1e20;
         return balance + _interest;
     }
 
-    function reserveBalance() public view returns (uint256) {
+    function reserveBalance() public view returns(uint256) {
         return IERC20(reserveToken).balanceOf(address(this));
     }
 
-    function ethernalRatio() public view returns (uint256) {
+    function ethernalRatio() public view returns(uint256) {
         uint256 _supply = totalSupply();
         if (_supply == 0) {
             return 1e18;
@@ -131,11 +131,11 @@ contract EthernalToken is ERC20, Ownable {
         return (distributionBalance() * 1e18) / _supply;
     }
 
-    function reserveToEthernalAmount(uint256 _amount) public view returns (uint256) {
+    function reserveToEthernalAmount(uint256 _amount) public view returns(uint256) {
         return (_amount * 1e18) / ethernalRatio();
     }
 
-    function ethernalToReserveAmount(uint256 _amount) public view returns (uint256) {
+    function ethernalToReserveAmount(uint256 _amount) public view returns(uint256) {
         return (_amount * ethernalRatio()) / 1e18;
     }
 

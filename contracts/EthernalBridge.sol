@@ -26,7 +26,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
         bool outgoingRefund; // flag for outgoing refund
     }
 
-    uint64 public chainId;
+    uint64 public immutable chainId;
     address public constant ETH_TOKEN = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address public xOracleMessage;
     uint256 public uid; // uid counter for outgoing, start with 1
@@ -317,23 +317,27 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
     // ------------------------------
     // view function
     // ------------------------------
-    function getTokenPause(address _token) external view returns (bool) {
+    function getTokenPause(address _token) external view returns(bool) {
         return IVault(tokenVaults[_token]).depositPause();
     }
 
-    function getTokenVault(address _token) external view returns (address) {
+    function getTokenVault(address _token) external view returns(address) {
         return tokenVaults[_token];
     }
 
-    function getSupportDstTokenIndex(uint64 _dstChainId, uint256 _tokenIndex) public view returns (bool) {
+    function getTokenIndexVault(uint256 _tokenIndex) external view returns(address) {
+        return tokenIndexVaults[_tokenIndex];
+    }
+
+    function getSupportDstTokenIndex(uint64 _dstChainId, uint256 _tokenIndex) public view returns(bool) {
         return supportDstTokenIndexes[_dstChainId][_tokenIndex];
     }
 
-    function getBridgeFee(uint64 _dstChainId) public view returns (uint256) {
+    function getBridgeFee(uint64 _dstChainId) public view returns(uint256) {
         return IXOracleMessage(xOracleMessage).getFee(_dstChainId);
     }
 
-    function getOutgoingBridge(uint256 _uid) external view returns (
+    function getOutgoingBridge(uint256 _uid) external view returns(
         uint256, // uid
         uint256, // srcTokenIndex
         uint256, // dstTokenIndex
@@ -356,7 +360,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
         );
     }
 
-    function getIncomingBridge(uint256 _srcChainId, uint256 _uid) external view returns (
+    function getIncomingBridge(uint256 _srcChainId, uint256 _uid) external view returns(
         uint256, // uid
         uint256, // srcTokenIndex
         uint256, // dstTokenIndex

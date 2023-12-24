@@ -3,6 +3,6 @@
 pragma solidity 0.8.19;
 
 interface IVBNB {
-  function mint() external payable;
-  function redeem(uint redeemTokens) external returns (uint);
+    function mint() external payable;
+    function redeem(uint redeemTokens) external returns(uint);
 }

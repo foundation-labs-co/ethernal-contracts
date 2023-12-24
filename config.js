@@ -49,6 +49,7 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.BTC,
       tokenName: 'btc',
       minDeposit: toWei(`0.00005`),
+      ibToken: '',
     },
     {
       type: 'VaultVenus',
@@ -56,6 +57,7 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.ETH,
       tokenName: 'eth',
       minDeposit: toWei(`0.001`),
+      ibToken: '',
     },
     {
       type: 'VaultVenusBNB',
@@ -63,6 +65,7 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.BNB,
       tokenName: 'bnb',
       minDeposit: toWei(`0.008`),
+      ibToken: '',
     },
     {
       type: 'VaultVenus',
@@ -70,6 +73,7 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.USDT,
       tokenName: 'usdt',
       minDeposit: toWei(`1`),
+      ibToken: '',
     },
     {
       type: 'VaultVenus',
@@ -77,6 +81,7 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.USDC,
       tokenName: 'usdc',
       minDeposit: toWei(`1`),
+      ibToken: '',
     },
   ],
 }
