@@ -76,6 +76,10 @@ describe("Ethernal Bridge", function () {
     it("Only owner can call this function", async function () {
         const [deployer, account2, account3] = await ethers.getSigners();
         const {AddressZero} = ethers.constants
+        const uid = await ethernalBridge.uid();
+
+        await expect(ethernalBridge.connect(account2).adminRefund(uid))
+        .to.be.revertedWith("Ownable: caller is not the owner");
 
         await expect(ethernalBridge.connect(account2).addAllowToken(usdt.address, vaultMintableUSDT.address))
         .to.be.revertedWith("Ownable: caller is not the owner");
@@ -87,6 +91,9 @@ describe("Ethernal Bridge", function () {
         .to.be.revertedWith("Ownable: caller is not the owner");
 
         await expect(ethernalBridge.connect(account2).setEndpoint(56, AddressZero))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+
+        await expect(ethernalBridge.connect(account2).setSupportDstTokenIndex(56, tokenIndexes.USDT, true))
         .to.be.revertedWith("Ownable: caller is not the owner");
     });
 
@@ -239,8 +246,6 @@ describe("Ethernal Bridge", function () {
         // Chain hardhat -> BSC
         // vault vaultETH -> vaultVenus
 
-        // function sendETH(uint64 _dstChainId, uint256 _dstTokenIndex, address _receiver)
-
         // srcChainId = dstChainId
         await expect(ethernalBridge.connect(account2).sendETH(chainIdHardHat, tokenIndexes.ETH, AddressZero, {value: 0}))
         .to.be.revertedWith("invalid chainId");
@@ -288,6 +293,65 @@ describe("Ethernal Bridge", function () {
         await expect(outgoingBridges.amount).to.equal(amount);
         await expect(outgoingBridges.bridgeType).to.equal(0); // outgoing
         await expect(outgoingBridges.outgoingRefund).to.equal(false);
+    });
+
+    it("Receiving", async function () {
+        const [deployer, account2, account3, endpoint] = await ethers.getSigners();
+        const {AddressZero} = ethers.constants
+
+        const chainIdHardHat = await ethernalBridge.chainId();
+        const chainIdBSC = 56;
+        const amount = expandDecimals(100, 18); // 100 USDT
+
+        // Bridge USDT -> EUSDT
+        // Chain  BSC -> hardhat
+        // vault vaultVenus -> vaultEthernal
+
+        await expect(ethernalBridge.connect(account2).receiving(0, tokenIndexes.USDT, tokenIndexes.EUSDT, 0, chainIdBSC, chainIdBSC, account2.address, account2.address))
+        .to.be.revertedWith("only xOracleMessage callback")
+
+        // set account2 to xOracleMessage
+        await ethernalBridge.connect(deployer).setXOracleMessage(account2.address);
+
+        await expect(ethernalBridge.connect(account2).receiving(0, tokenIndexes.USDT, tokenIndexes.EUSDT, 0, chainIdBSC, chainIdBSC, account2.address, account2.address))
+        .to.be.revertedWith("invalid uid")
+
+        await expect(ethernalBridge.connect(account2).receiving(1, tokenIndexes.USDT, tokenIndexes.EUSDT, 0, chainIdBSC, chainIdBSC, account2.address, account2.address))
+        .to.be.revertedWith("invalid amount")
+
+        await expect(ethernalBridge.connect(account2).receiving(1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdBSC, account2.address, account2.address))
+        .to.be.revertedWith("invalid chainId")
+
+        await expect(ethernalBridge.connect(account2).receiving(1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdHardHat, account2.address, AddressZero))
+        .to.be.revertedWith("invalid receiver address")
+
+        await expect(ethernalBridge.connect(account2).receiving(1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdHardHat, account2.address, account2.address))
+        .to.be.revertedWith("tokenIndex not allowed")
+
+        await ethernalBridge.connect(deployer).addAllowToken(eusdt.address, vaultEthernalEUSDT.address);
+
+        await vaultEthernalEUSDT.connect(deployer).setController(ethernalBridge.address);
+        await usdt.connect(deployer).setController(vaultEthernalEUSDT.address, true);
+
+        await ethernalBridge.connect(account2).receiving(1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdHardHat, account2.address, account2.address)
+
+        // incomingBridges = parameters
+        const uidSrcChain = 1;
+        incomingBridges = await ethernalBridge.incomingBridges(chainIdBSC, uidSrcChain);
+        await expect(incomingBridges.srcChainId).to.equal(chainIdBSC);
+        await expect(incomingBridges.dstChainId).to.equal(chainIdHardHat);
+        await expect(incomingBridges.srcTokenIndex).to.equal(tokenIndexes.USDT);
+        await expect(incomingBridges.dstTokenIndex).to.equal(tokenIndexes.EUSDT);
+        await expect(incomingBridges.from).to.equal(account2.address);
+        await expect(incomingBridges.receiver).to.equal(account2.address);
+        await expect(incomingBridges.amount).to.equal(amount);
+        await expect(incomingBridges.bridgeType).to.equal(1); // incoming
+        await expect(incomingBridges.outgoingRefund).to.equal(false);
+        
+        // check already received
+        await expect(ethernalBridge.connect(account2).receiving(1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdHardHat, account2.address, account2.address))
+        .to.be.revertedWith("already received")
+        
     });
 })
 
