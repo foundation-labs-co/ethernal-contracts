@@ -26,6 +26,7 @@ interface IEthernalToken {
     function interestPerBlock() external view returns(uint256);
     function blockPerYear() external view returns(uint256);
     function ethernalToReserveAmount(uint256 amount) external view returns(uint256);
+    function ethernalRatio() external view returns(uint256);
 }
 
 contract EthernalReader {
@@ -39,6 +40,7 @@ contract EthernalReader {
         // for ethernal token
         bool isEthernalToken; // is ethernal token
         uint256 apr; // apr for ethernal token
+        uint256 exchangeRate; // exchange rate for ethernal token
         uint256 reserveBalance; // reserve balance for ethernal token
     }
 
@@ -58,12 +60,15 @@ contract EthernalReader {
             // check if reserveToken != token, it's ethernal token
             bool isEthernalToken = IVault(vault).reserveToken() != token;
             uint256 apr = 0;
+            uint256 exchangeRate = 1;
             uint256 reserveBalance = balance;
             
             if (isEthernalToken) {
                 address ethernalToken = IVaultEthernal(vault).ethernalToken();
                 // precision 18 decimals
                 apr = IEthernalToken(ethernalToken).interestPerBlock() * IEthernalToken(ethernalToken).blockPerYear();
+                // get exchange rate
+                exchangeRate = IEthernalToken(ethernalToken).ethernalRatio();
                 // get reserve balance
                 reserveBalance = IEthernalToken(ethernalToken).ethernalToReserveAmount(balance);
             }
@@ -76,6 +81,7 @@ contract EthernalReader {
                 isPause: pause,
                 isEthernalToken: isEthernalToken,
                 apr: apr,
+                exchangeRate: exchangeRate,
                 reserveBalance: reserveBalance
             });
         }
@@ -104,7 +110,7 @@ contract EthernalReader {
             // precision 18 decimals
             apr = IEthernalToken(ethernalToken).interestPerBlock() * IEthernalToken(ethernalToken).blockPerYear();
             // get exchange rate
-            exchangeRate = IEthernalToken(ethernalToken).ethernalToReserveAmount(1e18);
+            exchangeRate = IEthernalToken(ethernalToken).ethernalRatio();
         }
     }
 }
