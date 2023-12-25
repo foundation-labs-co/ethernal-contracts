@@ -192,21 +192,37 @@ describe("Ethernal Bridge", function () {
 
         // set controller for mint usdt
         await usdt.connect(deployer).setController(deployer.address, true);
-        await usdt.connect(deployer).mint(account2.address, expandDecimals(100, 18));
-        await usdt.connect(account2).approve(eusdt.address, expandDecimals(100, 18));
+
+        const amount = expandDecimals(100, 18); // 100 USDT
+        await usdt.connect(deployer).mint(account2.address, amount);
+        await usdt.connect(account2).approve(eusdt.address, amount);
 
         // deposit usdt get 100 eusdt
-        await eusdt.connect(account2).deposit(expandDecimals(100, 18));
+        await eusdt.connect(account2).deposit(amount);
 
         // set controller for burn
         await usdt.connect(deployer).setController(vaultEthernalEUSDT.address, true);
 
         // approve eusdt to ethernalBridge
-        await eusdt.connect(account2).approve(ethernalBridge.address, expandDecimals(100, 18));
+        await eusdt.connect(account2).approve(ethernalBridge.address, amount);
 
         await vaultEthernalEUSDT.connect(deployer).setController(ethernalBridge.address);
 
-        await ethernalBridge.connect(account2).send(eusdt.address, expandDecimals(100, 18), chainIdBSC, tokenIndexes.USDT, account2.address, {value: fee});
+        await ethernalBridge.connect(account2).send(eusdt.address, amount, chainIdBSC, tokenIndexes.USDT, account2.address, {value: fee});
+        
+        // outgoingBridges = parameter
+        const uid = await ethernalBridge.uid();
+        outgoingBridges = await ethernalBridge.outgoingBridges(uid);
+
+        await expect(outgoingBridges.srcChainId).to.equal(chainIdHardHat);
+        await expect(outgoingBridges.dstChainId).to.equal(chainIdBSC);
+        await expect(outgoingBridges.srcTokenIndex).to.equal(tokenIndexes.EUSDT);
+        await expect(outgoingBridges.dstTokenIndex).to.equal(tokenIndexes.USDT);
+        await expect(outgoingBridges.from).to.equal(account2.address);
+        await expect(outgoingBridges.receiver).to.equal(account2.address);
+        await expect(outgoingBridges.amount).to.equal(amount);
+        await expect(outgoingBridges.bridgeType).to.equal(0); // outgoing
+        await expect(outgoingBridges.outgoingRefund).to.equal(false);
     });
 
     it("Send ETH", async function () {
@@ -216,11 +232,14 @@ describe("Ethernal Bridge", function () {
         const chainIdHardHat = await vaultETH.chainId();
         const chainIdBSC = 56;
         const ETH_TOKEN = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
-        const amount = 1; // 1 ETH
+        const amount = expandDecimals(1, 18); // 1 ETH
+        const amountWithFee = amount.add(fee);
 
         // Bridge ETH -> ETH  
         // Chain hardhat -> BSC
         // vault vaultETH -> vaultVenus
+
+        // function sendETH(uint64 _dstChainId, uint256 _dstTokenIndex, address _receiver)
 
         // srcChainId = dstChainId
         await expect(ethernalBridge.connect(account2).sendETH(chainIdHardHat, tokenIndexes.ETH, AddressZero, {value: 0}))
@@ -235,26 +254,40 @@ describe("Ethernal Bridge", function () {
         .to.be.revertedWith("insufficient fee");
 
         // not yet set endpoint
-        await expect(ethernalBridge.connect(account2).sendETH(0, tokenIndexes.ETH, account2.address, {value: fee + amount}))
+        await expect(ethernalBridge.connect(account2).sendETH(0, tokenIndexes.ETH, account2.address, {value: amountWithFee}))
         .to.be.revertedWith("invalid endpoint address");
 
         await ethernalBridge.connect(deployer).setEndpoint(chainIdBSC, endpoint.address)
 
         // not yet add allow token
-        await expect(ethernalBridge.connect(account2).sendETH(chainIdBSC, tokenIndexes.ETH, account2.address, {value: fee + amount}))
+        await expect(ethernalBridge.connect(account2).sendETH(chainIdBSC, tokenIndexes.ETH, account2.address, {value: amountWithFee}))
         .to.be.revertedWith("token not allowed");
 
         await ethernalBridge.connect(deployer).addAllowToken(ETH_TOKEN, vaultETH.address);
 
         // bridge not set support Token
-        await expect(ethernalBridge.connect(account2).sendETH(chainIdBSC, tokenIndexes.ETH, account2.address, {value: fee + amount}))
+        await expect(ethernalBridge.connect(account2).sendETH(chainIdBSC, tokenIndexes.ETH, account2.address, {value: amountWithFee}))
         .to.be.revertedWith("dstTokenIndex not allowed");
 
         await ethernalBridge.connect(deployer).setSupportDstTokenIndex(chainIdBSC, tokenIndexes.ETH, true);
 
         await vaultETH.connect(deployer).setController(ethernalBridge.address);
 
-        await ethernalBridge.connect(account2).sendETH(chainIdBSC, tokenIndexes.ETH, account2.address, {value: fee + amount});
+        await ethernalBridge.connect(account2).sendETH(chainIdBSC, tokenIndexes.ETH, account2.address, {value: amountWithFee});
+        
+        // outgoingBridges = parameters
+        const uid = await ethernalBridge.uid();
+        outgoingBridges = await ethernalBridge.outgoingBridges(uid);
+
+        await expect(outgoingBridges.srcChainId).to.equal(chainIdHardHat);
+        await expect(outgoingBridges.dstChainId).to.equal(chainIdBSC);
+        await expect(outgoingBridges.srcTokenIndex).to.equal(tokenIndexes.ETH);
+        await expect(outgoingBridges.dstTokenIndex).to.equal(tokenIndexes.ETH);
+        await expect(outgoingBridges.from).to.equal(account2.address);
+        await expect(outgoingBridges.receiver).to.equal(account2.address);
+        await expect(outgoingBridges.amount).to.equal(amount);
+        await expect(outgoingBridges.bridgeType).to.equal(0); // outgoing
+        await expect(outgoingBridges.outgoingRefund).to.equal(false);
     });
 })
 
