@@ -225,9 +225,6 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
         address vault = tokenIndexVaults[_dstTokenIndex];
         require(vault != address(0), "tokenIndex not allowed");
 
-        // withdraw to receiver
-        IVault(vault).withdraw(_receiver, _amount);
-
         // save user bridge incoming
         incomingBridges[_srcChainId][_uid] = UserBridge({
             uid: _uid,
@@ -241,6 +238,9 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
             bridgeType: 1, // incoming
             outgoingRefund: false
         });
+        
+        // withdraw to receiver
+        IVault(vault).withdraw(_receiver, _amount);
 
         emit Receive(_uid, _srcTokenIndex, _dstTokenIndex, _amount, _srcChainId, _dstChainId, _from, _receiver);
     }
