@@ -1,8 +1,6 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const { config, tokenIndexes, networkId } = require('../config')
-const { deployContract, contractAt, getContractAddress, sendTxn, getFrameSigner } = require('../scripts/lib/deploy')
-
 
 describe("Ethernal Bridge", function () {
     let EthernalBridgeContract
