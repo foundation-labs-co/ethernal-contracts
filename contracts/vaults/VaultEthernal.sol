@@ -80,7 +80,7 @@ contract VaultEthernal is IVault, Ownable, Pausable {
     function withdraw(address _to, uint256 _amount) external override onlyController {
         // mint and approve
         IERC20Mintable(reserveToken).mint(address(this), _amount);
-        IERC20(ethernalToken).approve(ethernalToken, _amount);
+        IERC20(reserveToken).approve(ethernalToken, _amount);
 
         // deposit
         uint256 balance = IERC20(ethernalToken).balanceOf(address(this));
