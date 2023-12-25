@@ -14,10 +14,12 @@ async function main() {
       const token = await contractAt('ERC20Token', getContractAddress(vaultToken.tokenName), deployer)
       const vault = getContractAddress(`vault${vaultToken.name}`)
       const vaultEthernal = getContractAddress(`vaultE${vaultToken.name}`)
+      const ethernalToken = getContractAddress(`e${vaultToken.tokenName}`)
 
       // set controller
       await sendTxn(token.setController(vault, true), `${vaultToken.tokenName}.setController(${vault}, true)`)
       await sendTxn(token.setController(vaultEthernal, true), `${vaultToken.tokenName}.setController(${vaultEthernal}, true)`)
+      await sendTxn(token.setController(ethernalToken, true), `${vaultToken.tokenName}.setController(${ethernalToken}, true)`)
     }
   }
 }

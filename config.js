@@ -6,28 +6,14 @@ const networkId = {
 }
 
 const tokenIndexes = {
+  // Default xOracle Pricefeed
   BTC: 0,
   ETH: 1,
   BNB: 2,
   USDT: 3,
-  // BUSD: 4,
   USDC: 5,
-  // DAI: 6,
-  // XRP: 10,
-  // DOGE: 11,
-  // TRX: 12,
-  // ADA: 20,
-  // MATIC: 21,
-  // SOL: 22,
-  // DOT: 23,
-  // AVAX: 24,
-  // FTM: 25,
-  // NEAR: 26,
-  // ATOM: 27,
-  // OP: 28,
-  // ARB: 29,
 
-  // Ethernal Passive Yield Token
+  // Additional for Ethernal Passive Yield Token
   EBTC: 100,
   EETH: 101,
   EBNB: 102,
