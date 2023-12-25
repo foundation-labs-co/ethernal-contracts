@@ -70,7 +70,7 @@ contract VaultVenusBNB is IVaultETH, Ownable, Pausable {
         uint256 balance = address(this).balance;
 
         // burn
-        IVBNB(ibToken).redeem(_amount);
+        IVBNB(ibToken).redeemUnderlying(_amount);
         
         uint256 reserveAmount = address(this).balance - balance;
         payable(_to).transfer(reserveAmount);
@@ -79,7 +79,8 @@ contract VaultVenusBNB is IVaultETH, Ownable, Pausable {
     }
 
     function totalBalance() external override view returns(uint256) {
-        return IERC20(reserveToken).balanceOf(address(this));
+        uint256 balance = IERC20(ibToken).balanceOf(address(this));
+        return (balance * 1e38) / IVBNB(ibToken).exchangeRateStored();
     }
 
     function depositPause() external override view returns(bool) {

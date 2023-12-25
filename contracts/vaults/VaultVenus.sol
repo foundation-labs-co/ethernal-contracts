@@ -68,10 +68,10 @@ contract VaultVenus is IVault, Ownable, Pausable {
      * @param _amount amount of ReserveToken
      */
     function withdraw(address _to, uint256 _amount) external override onlyController {
-        uint256 balance = IVToken(reserveToken).balanceOf(address(this));
+        uint256 balance = IERC20(reserveToken).balanceOf(address(this));
 
         // burn
-        IVToken(ibToken).redeem(_amount);
+        IVToken(ibToken).redeemUnderlying(_amount);
         
         uint256 reserveAmount = IERC20(reserveToken).balanceOf(address(this)) - balance;
         IERC20(reserveToken).transfer(_to, reserveAmount);
@@ -80,7 +80,8 @@ contract VaultVenus is IVault, Ownable, Pausable {
     }
 
     function totalBalance() external override view returns(uint256) {
-        return IERC20(reserveToken).balanceOf(address(this));
+        uint256 balance = IERC20(ibToken).balanceOf(address(this));
+        return (balance * 1e38) / IVToken(ibToken).exchangeRateStored();
     }
 
     function depositPause() external override view returns(bool) {
