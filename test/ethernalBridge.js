@@ -70,7 +70,6 @@ describe("Ethernal Bridge", function () {
         // Deploy Vault ETH 
         vaultETH = await VaultETH.deploy(tokenIndexes.ETH, eth.address, expandDecimals(1, 18), "0x0000000000000000000000000000000000000000");
         await vaultETH.deployed();
-
     });
 
     it("Only owner can call this function", async function () {
@@ -131,7 +130,6 @@ describe("Ethernal Bridge", function () {
 
         await expect(ethernalBridge.connect(deployer).setXOracleMessage(AddressZero))
         .to.be.revertedWith("invalid address");
-
     });
 
     it("Set Endpoint", async function () {
@@ -140,7 +138,6 @@ describe("Ethernal Bridge", function () {
 
         await expect(ethernalBridge.connect(deployer).setEndpoint(56, AddressZero))
         .to.be.revertedWith("invalid address");
-
     });
 
     it("Set Support Dst Token Index", async function () {
@@ -219,7 +216,7 @@ describe("Ethernal Bridge", function () {
         
         // outgoingBridges = parameter
         const uid = await ethernalBridge.uid();
-        outgoingBridges = await ethernalBridge.outgoingBridges(uid);
+        const outgoingBridges = await ethernalBridge.outgoingBridges(uid);
 
         await expect(outgoingBridges.srcChainId).to.equal(chainIdHardHat);
         await expect(outgoingBridges.dstChainId).to.equal(chainIdBSC);
@@ -230,6 +227,25 @@ describe("Ethernal Bridge", function () {
         await expect(outgoingBridges.amount).to.equal(amount);
         await expect(outgoingBridges.bridgeType).to.equal(0); // outgoing
         await expect(outgoingBridges.outgoingRefund).to.equal(false);
+
+        // admin refund
+        await ethernalBridge.connect(deployer).removeAllowToken(eusdt.address);
+
+        await expect(ethernalBridge.connect(deployer).adminRefund(999))
+        .to.be.revertedWith("uid not found");
+
+        await expect(ethernalBridge.connect(deployer).adminRefund(uid))
+        .to.be.revertedWith("tokenIndex not allowed");
+
+        await ethernalBridge.connect(deployer).addAllowToken(eusdt.address, vaultEthernalEUSDT.address);
+
+        await ethernalBridge.connect(deployer).adminRefund(uid);
+
+        await expect(ethernalBridge.connect(deployer).adminRefund(uid))
+        .to.be.revertedWith("already refunded");
+
+        const outgoingBridgesAfterRefund = await ethernalBridge.outgoingBridges(uid);
+        await expect(outgoingBridgesAfterRefund.outgoingRefund).to.be.equal(true);
     });
 
     it("Send ETH", async function () {
@@ -293,6 +309,26 @@ describe("Ethernal Bridge", function () {
         await expect(outgoingBridges.amount).to.equal(amount);
         await expect(outgoingBridges.bridgeType).to.equal(0); // outgoing
         await expect(outgoingBridges.outgoingRefund).to.equal(false);
+
+        // admin refund
+        await ethernalBridge.connect(deployer).removeAllowToken(ETH_TOKEN);
+
+        await expect(ethernalBridge.connect(deployer).adminRefund(999))
+        .to.be.revertedWith("uid not found");
+
+        await expect(ethernalBridge.connect(deployer).adminRefund(uid))
+        .to.be.revertedWith("tokenIndex not allowed");
+
+        await ethernalBridge.connect(deployer).addAllowToken(ETH_TOKEN, vaultETH.address);
+
+        await ethernalBridge.connect(deployer).adminRefund(uid);
+
+        await expect(ethernalBridge.connect(deployer).adminRefund(uid))
+        .to.be.revertedWith("already refunded");
+
+        const outgoingBridgesAfterRefund = await ethernalBridge.outgoingBridges(uid);
+        
+        await expect(outgoingBridgesAfterRefund.outgoingRefund).to.be.equal(true);
     });
 
     it("Receiving", async function () {
@@ -351,7 +387,6 @@ describe("Ethernal Bridge", function () {
         // check already received
         await expect(ethernalBridge.connect(account2).receiving(1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdHardHat, account2.address, account2.address))
         .to.be.revertedWith("already received")
-        
     });
 })
 
