@@ -11,19 +11,19 @@ describe("Vaults", function () {
 
     let vaultEthernalEUSDT
 
-    const fee = expandDecimals(1,15); // 0.001 ETH
-
     beforeEach(async function () {
 
         // Token Contract
         ERC20Token = await ethers.getContractFactory("ERC20Token");
         EthernalToken = await ethers.getContractFactory("EthernalToken");
         VenusToken = await ethers.getContractFactory("VenusToken");
+        VenusTokenBNB = await ethers.getContractFactory("VenusTokenBNB");
 
         // Vault Contract
         VaultMintable = await ethers.getContractFactory("VaultMintable");
         VaultEthernal = await ethers.getContractFactory("VaultEthernal");
         VaultVenus = await ethers.getContractFactory("VaultVenus");
+        VaultVenusBNB = await ethers.getContractFactory("VaultVenusBNB");
 
         // Deploy Token
 
@@ -39,9 +39,16 @@ describe("Vaults", function () {
         eeth = await EthernalToken.deploy("Ethernal Passive Yield ETH", "EETH", eth.address);
         await eeth.deployed();
 
+        // BNB
+        bnb = await ERC20Token.deploy("BNB (Ethernal)", "BNB");
+        await bnb.deployed();
+
         // Venus
         ibToken = await VenusToken.deploy(usdt.address);
         await ibToken.deployed();
+        // Venus BNB
+        ibTokenBNB = await VenusTokenBNB.deploy();
+        await ibTokenBNB.deployed();
 
         // Deploy Vault USDT - EUSDT
         vaultMintableUSDT = await VaultMintable.deploy(tokenIndexes.USDT, usdt.address, expandDecimals(1, 18));
@@ -60,6 +67,10 @@ describe("Vaults", function () {
         // Deploy Vault Venus
         vaultVenus = await VaultVenus.deploy(tokenIndexes.USDT, usdt.address, expandDecimals(1000, 18), ibToken.address);
         await vaultVenus.deployed();
+
+        // Deploy Vault Venus BNB
+        vaultVenusBNB = await VaultVenusBNB.deploy(tokenIndexes.BNB, bnb.address, expandDecimals(1000, 18), ibTokenBNB.address);
+        await vaultVenusBNB.deployed();
     });
 
     it("VaultMintable: Only owner can call this function", async function () {
@@ -269,6 +280,77 @@ describe("Vaults", function () {
         await vaultVenus.connect(deployer).withdraw(account2.address, amount)
 
         expect(await usdt.balanceOf(account2.address)).to.be.equal(amount);
+    });
+
+    it("VaultVenusBNB: Only owner can call this function", async function () {
+        const [deployer, account2, account3] = await ethers.getSigners();
+        const {AddressZero} = ethers.constants
+
+        await expect(vaultVenusBNB.connect(account2).setController(account2.address))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+
+        await expect(vaultVenusBNB.connect(deployer).setController(AddressZero))
+        .to.be.revertedWith("invalid address");
+
+        await expect(vaultVenusBNB.connect(account2).setMinDeposit(expandDecimals(1, 18)))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+
+        await expect(vaultVenusBNB.connect(account2).setDepositPause(true))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+    });
+
+    it("VaultVenusBNB: Deposit & Withdraw", async function () {
+        const [deployer, account2, account3] = await ethers.getSigners();
+        const {AddressZero} = ethers.constants
+        const amount = expandDecimals(100, 18);
+
+        // deposit
+        await vaultVenusBNB.connect(deployer).setDepositPause(true)
+
+        await expect(vaultVenusBNB.connect(deployer).deposit(account2.address, {value: 0}))
+        .to.be.revertedWith("onlyController: caller is not the controller");
+
+        await vaultVenusBNB.connect(deployer).setController(deployer.address)
+
+        await expect(vaultVenusBNB.connect(deployer).deposit(account2.address, {value: 0}))
+        .to.be.revertedWith("Pausable: paused");
+
+        await vaultVenusBNB.connect(deployer).setDepositPause(false)
+
+        await expect(vaultVenusBNB.connect(deployer).deposit(account2.address, {value: 0}))
+        .to.be.revertedWith("amount too small");
+
+        await vaultVenusBNB.connect(deployer).setMinDeposit(expandDecimals(1, 18))
+
+        // balance 
+        expect(await ethers.provider.getBalance(vaultVenusBNB.address)).to.be.equal(0);
+        expect(await ethers.provider.getBalance(ibTokenBNB.address)).to.be.equal(0);
+
+        await vaultVenusBNB.connect(deployer).deposit(account2.address, {value: amount})
+
+        expect(await ethers.provider.getBalance(vaultVenusBNB.address)).to.be.equal(0);
+        expect(await ethers.provider.getBalance(ibTokenBNB.address)).to.be.equal(amount);
+
+        // withdraw
+        await vaultVenusBNB.connect(deployer).setController(account2.address)
+
+        await expect(vaultVenusBNB.connect(deployer).withdraw(account2.address, amount))
+        .to.be.revertedWith("onlyController: caller is not the controller");
+
+        await vaultVenusBNB.connect(deployer).setController(deployer.address)
+
+        expect(await ethers.provider.getBalance(vaultVenusBNB.address)).to.be.equal(0);
+        expect(await ethers.provider.getBalance(ibTokenBNB.address)).to.be.equal(amount);
+
+        const balance = await ethers.provider.getBalance(account2.address);
+
+        await vaultVenusBNB.connect(deployer).withdraw(account2.address, amount)
+
+        expect(await ethers.provider.getBalance(vaultVenusBNB.address)).to.be.equal(0);
+        expect(await ethers.provider.getBalance(ibTokenBNB.address)).to.be.equal(0);
+
+        const balanceAfter = await ethers.provider.getBalance(account2.address);
+        expect(balanceAfter.sub(balance)).to.be.equal(amount);
     });
 })
 
