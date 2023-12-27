@@ -2,6 +2,8 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const { config, tokenIndexes, networkId } = require('../config')
 
+const abiCoder = new ethers.utils.AbiCoder()
+
 describe("Ethernal Bridge", function () {
     let EthernalBridgeContract
 
@@ -329,8 +331,8 @@ describe("Ethernal Bridge", function () {
         await expect(outgoingBridgesAfterRefund.outgoingRefund).to.be.equal(true);
     });
 
-    it("Receiving", async function () {
-        const [deployer, account2, account3, endpoint] = await ethers.getSigners();
+    it("Receiving from xOracleCall", async function () {
+        const [deployer, account2, account3] = await ethers.getSigners();
         const {AddressZero} = ethers.constants
 
         const chainIdHardHat = await ethernalBridge.chainId();
@@ -341,25 +343,25 @@ describe("Ethernal Bridge", function () {
         // Chain  BSC -> hardhat
         // vault vaultVenus -> vaultEthernal
 
-        await expect(ethernalBridge.connect(account2).receiving(0, tokenIndexes.USDT, tokenIndexes.EUSDT, 0, chainIdBSC, chainIdBSC, account2.address, account2.address))
+        await expect(ethernalBridge.connect(account2).xOracleCall(encodePayload(0, tokenIndexes.USDT, tokenIndexes.EUSDT, 0, chainIdBSC, chainIdBSC, account2.address, account2.address)))
         .to.be.revertedWith("only xOracleMessage callback")
 
         // set account2 to xOracleMessage
         await ethernalBridge.connect(deployer).setXOracleMessage(account2.address);
 
-        await expect(ethernalBridge.connect(account2).receiving(0, tokenIndexes.USDT, tokenIndexes.EUSDT, 0, chainIdBSC, chainIdBSC, account2.address, account2.address))
+        await expect(ethernalBridge.connect(account2).xOracleCall(encodePayload(0, tokenIndexes.USDT, tokenIndexes.EUSDT, 0, chainIdBSC, chainIdBSC, account2.address, account2.address)))
         .to.be.revertedWith("invalid uid")
 
-        await expect(ethernalBridge.connect(account2).receiving(1, tokenIndexes.USDT, tokenIndexes.EUSDT, 0, chainIdBSC, chainIdBSC, account2.address, account2.address))
+        await expect(ethernalBridge.connect(account2).xOracleCall(encodePayload(1, tokenIndexes.USDT, tokenIndexes.EUSDT, 0, chainIdBSC, chainIdBSC, account2.address, account2.address)))
         .to.be.revertedWith("invalid amount")
 
-        await expect(ethernalBridge.connect(account2).receiving(1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdBSC, account2.address, account2.address))
+        await expect(ethernalBridge.connect(account2).xOracleCall(encodePayload(1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdBSC, account2.address, account2.address)))
         .to.be.revertedWith("invalid chainId")
 
-        await expect(ethernalBridge.connect(account2).receiving(1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdHardHat, account2.address, AddressZero))
+        await expect(ethernalBridge.connect(account2).xOracleCall(encodePayload(1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdHardHat, account2.address, AddressZero)))
         .to.be.revertedWith("invalid receiver address")
 
-        await expect(ethernalBridge.connect(account2).receiving(1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdHardHat, account2.address, account2.address))
+        await expect(ethernalBridge.connect(account2).xOracleCall(encodePayload(1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdHardHat, account2.address, account2.address)))
         .to.be.revertedWith("tokenIndex not allowed")
 
         await ethernalBridge.connect(deployer).addAllowToken(eusdt.address, vaultEthernalEUSDT.address);
@@ -367,7 +369,7 @@ describe("Ethernal Bridge", function () {
         await vaultEthernalEUSDT.connect(deployer).setController(ethernalBridge.address);
         await usdt.connect(deployer).setController(vaultEthernalEUSDT.address, true);
 
-        await ethernalBridge.connect(account2).receiving(1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdHardHat, account2.address, account2.address)
+        await ethernalBridge.connect(account2).xOracleCall(encodePayload(1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdHardHat, account2.address, account2.address))
 
         // incomingBridges = parameters
         const uidSrcChain = 1;
@@ -382,8 +384,8 @@ describe("Ethernal Bridge", function () {
         await expect(incomingBridges.bridgeType).to.equal(1); // incoming
         await expect(incomingBridges.outgoingRefund).to.equal(false);
         
-        // check already received
-        await expect(ethernalBridge.connect(account2).receiving(1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdHardHat, account2.address, account2.address))
+        // // check already received
+        await expect(ethernalBridge.connect(account2).xOracleCall(encodePayload(1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdHardHat, account2.address, account2.address)))
         .to.be.revertedWith("already received")
     });
 })
@@ -394,4 +396,12 @@ function bigNumberify(n) {
 
 function expandDecimals(n, decimals) {
     return bigNumberify(n).mul(bigNumberify(10).pow(decimals))
+}
+
+function encodePayload(uid, srcTokenIndex, dstTokenIndex, amount, srcChainId, dstChainId, from, receiver) {
+    const encodedData = abiCoder.encode(
+        ['uint256', 'uint256', 'uint256', 'uint256', 'uint64', 'uint64', 'address', 'address'],
+        [uid, srcTokenIndex, dstTokenIndex, amount, srcChainId, dstChainId, from, receiver]
+    )
+    return encodedData;
 }
