@@ -42,10 +42,10 @@ describe("ERC20 Token and Ethernal Token", function () {
         const [deployer, account2, account3] = await ethers.getSigners();
 
         await expect(usdt.connect(account2).mint(account3.address, expandDecimals(100, 18)))
-        .to.be.revertedWith("onlyController: caller is not the controller");
+        .to.be.revertedWith("ERC20Token: caller is not the controller");
         
         await expect(usdt.connect(account2).burn(account3.address, expandDecimals(100, 18)))
-        .to.be.revertedWith("onlyController: caller is not the controller");
+        .to.be.revertedWith("ERC20Token: caller is not the controller");
     });
 
     it("ERC20Token: Mint & Burn ", async function () {
@@ -354,4 +354,3 @@ function bigNumberify(n) {
 function expandDecimals(n, decimals) {
     return bigNumberify(n).mul(bigNumberify(10).pow(decimals))
 }
-
