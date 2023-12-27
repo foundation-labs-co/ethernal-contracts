@@ -56,6 +56,15 @@ async function main() {
       )
     }
   }
+
+  // set pair tokenIndex
+  for (let i = 0; i < config.pairTokenIndexes.length; i++) {
+    const pairTokenIndex = config.pairTokenIndexes[i]
+    await sendTxn(
+      ethernalBridge.addPairTokenIndex(pairTokenIndex[0], pairTokenIndex[1]),
+      `ethernalBridge.addPairTokenIndex(${pairTokenIndex[0]}, ${pairTokenIndex[1]})`
+    )
+  }
 }
 
 main()
