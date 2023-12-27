@@ -5,7 +5,6 @@ pragma solidity 0.8.19;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract VenusToken {
-
     address public underlyingToken;
 
     constructor(address _underlyingToken) {
@@ -19,6 +18,14 @@ contract VenusToken {
 
     function redeemUnderlying(uint redeemAmount) external returns (uint) {
         IERC20(underlyingToken).transfer(msg.sender, redeemAmount);
+        return 0;
+    }
+
+    function balanceOf(address account) external view returns (uint256) {
+        return IERC20(address(this)).balanceOf(account);
+    }
+
+    function exchangeRateStored() external pure returns (uint) {
         return 0;
     }
 }
