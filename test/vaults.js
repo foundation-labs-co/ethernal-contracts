@@ -73,164 +73,164 @@ describe("Vaults", function () {
         await vaultVenusBNB.deployed();
     });
 
-    // it("VaultMintable: Only owner can call this function", async function () {
-    //     const [deployer, account2, account3] = await ethers.getSigners();
-    //     const {AddressZero} = ethers.constants
+    it("VaultMintable: Only owner can call this function", async function () {
+        const [deployer, account2, account3] = await ethers.getSigners();
+        const {AddressZero} = ethers.constants
 
-    //     await expect(vaultMintableUSDT.connect(account2).setController(account2.address))
-    //     .to.be.revertedWith("Ownable: caller is not the owner");
+        await expect(vaultMintableUSDT.connect(account2).setController(account2.address))
+        .to.be.revertedWith("Ownable: caller is not the owner");
 
-    //     await expect(vaultMintableUSDT.connect(deployer).setController(AddressZero))
-    //     .to.be.revertedWith("invalid address");
+        await expect(vaultMintableUSDT.connect(deployer).setController(AddressZero))
+        .to.be.revertedWith("invalid address");
 
-    //     await expect(vaultMintableUSDT.connect(account2).setMinDeposit(expandDecimals(1, 18)))
-    //     .to.be.revertedWith("Ownable: caller is not the owner");
+        await expect(vaultMintableUSDT.connect(account2).setMinDeposit(expandDecimals(1, 18)))
+        .to.be.revertedWith("Ownable: caller is not the owner");
 
-    //     await expect(vaultMintableUSDT.connect(account2).setDepositPause(true))
-    //     .to.be.revertedWith("Ownable: caller is not the owner");
-    // });
+        await expect(vaultMintableUSDT.connect(account2).setDepositPause(true))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+    });
 
-    // it("VaultMintable: Deposit", async function () {
-    //     const [deployer, account2, account3] = await ethers.getSigners();
-    //     const {AddressZero} = ethers.constants
-    //     const amount = expandDecimals(100, 18);
+    it("VaultMintable: Deposit", async function () {
+        const [deployer, account2, account3] = await ethers.getSigners();
+        const {AddressZero} = ethers.constants
+        const amount = expandDecimals(100, 18);
 
-    //     await vaultMintableUSDT.connect(deployer).setDepositPause(true)
+        await vaultMintableUSDT.connect(deployer).setDepositPause(true)
 
-    //     await expect(vaultMintableUSDT.connect(deployer).deposit(account2.address, expandDecimals(1, 18)))
-    //     .to.be.revertedWith("VaultMintable: caller is not the controller");
+        await expect(vaultMintableUSDT.connect(deployer).deposit(account2.address, expandDecimals(1, 18)))
+        .to.be.revertedWith("VaultMintable: caller is not the controller");
 
-    //     await vaultMintableUSDT.connect(deployer).setController(deployer.address)
+        await vaultMintableUSDT.connect(deployer).setController(deployer.address)
 
-    //     await expect(vaultMintableUSDT.connect(deployer).deposit(account2.address, expandDecimals(1, 18)))
-    //     .to.be.revertedWith("Pausable: paused");
+        await expect(vaultMintableUSDT.connect(deployer).deposit(account2.address, expandDecimals(1, 18)))
+        .to.be.revertedWith("Pausable: paused");
 
-    //     await vaultMintableUSDT.connect(deployer).setDepositPause(false)
+        await vaultMintableUSDT.connect(deployer).setDepositPause(false)
 
-    //     await expect(vaultMintableUSDT.connect(deployer).deposit(account2.address, expandDecimals(1, 18)))
-    //     .to.be.revertedWith("amount too small");
+        await expect(vaultMintableUSDT.connect(deployer).deposit(account2.address, expandDecimals(1, 18)))
+        .to.be.revertedWith("amount too small");
 
-    //     await vaultMintableUSDT.connect(deployer).setMinDeposit(expandDecimals(1, 18))
+        await vaultMintableUSDT.connect(deployer).setMinDeposit(expandDecimals(1, 18))
 
-    //     await expect(vaultMintableUSDT.connect(deployer).deposit(account2.address, amount))
-    //     .to.be.revertedWith("insufficient amount");
+        await expect(vaultMintableUSDT.connect(deployer).deposit(account2.address, amount))
+        .to.be.revertedWith("insufficient amount");
 
-    //     await usdt.connect(deployer).setController(deployer.address, true);
-    //     await usdt.connect(deployer).setController(vaultMintableUSDT.address, true);
-    //     await usdt.connect(deployer).mint(vaultMintableUSDT.address, amount);
-    //     expect(await usdt.balanceOf(vaultMintableUSDT.address)).to.be.equal(amount);
+        await usdt.connect(deployer).setController(deployer.address, true);
+        await usdt.connect(deployer).setController(vaultMintableUSDT.address, true);
+        await usdt.connect(deployer).mint(vaultMintableUSDT.address, amount);
+        expect(await usdt.balanceOf(vaultMintableUSDT.address)).to.be.equal(amount);
 
-    //     await vaultMintableUSDT.connect(deployer).deposit(account2.address, amount)
+        await vaultMintableUSDT.connect(deployer).deposit(account2.address, amount)
 
-    //     expect(await usdt.balanceOf(vaultMintableUSDT.address)).to.be.equal(0);
-    // });
+        expect(await usdt.balanceOf(vaultMintableUSDT.address)).to.be.equal(0);
+    });
 
-    // it("VaultMintable: Withdraw", async function () {
-    //     const [deployer, account2, account3] = await ethers.getSigners();
-    //     const {AddressZero} = ethers.constants
-    //     const amount = expandDecimals(100, 18);
+    it("VaultMintable: Withdraw", async function () {
+        const [deployer, account2, account3] = await ethers.getSigners();
+        const {AddressZero} = ethers.constants
+        const amount = expandDecimals(100, 18);
 
-    //     await expect(vaultMintableUSDT.connect(deployer).withdraw(account2.address, amount))
-    //     .to.be.revertedWith("VaultMintable: caller is not the controller");
+        await expect(vaultMintableUSDT.connect(deployer).withdraw(account2.address, amount))
+        .to.be.revertedWith("VaultMintable: caller is not the controller");
 
-    //     await vaultMintableUSDT.connect(deployer).setController(deployer.address)
-    //     await usdt.connect(deployer).setController(vaultMintableUSDT.address, true);
+        await vaultMintableUSDT.connect(deployer).setController(deployer.address)
+        await usdt.connect(deployer).setController(vaultMintableUSDT.address, true);
 
-    //     expect(await usdt.balanceOf(account2.address)).to.be.equal(0);
+        expect(await usdt.balanceOf(account2.address)).to.be.equal(0);
 
-    //     await vaultMintableUSDT.connect(deployer).withdraw(account2.address, amount)
+        await vaultMintableUSDT.connect(deployer).withdraw(account2.address, amount)
 
-    //     expect(await usdt.balanceOf(account2.address)).to.be.equal(amount);
-    // });
+        expect(await usdt.balanceOf(account2.address)).to.be.equal(amount);
+    });
 
-    // it("VaultEthernal: Only owner can call this function", async function () {
-    //     const [deployer, account2, account3] = await ethers.getSigners();
-    //     const {AddressZero} = ethers.constants
+    it("VaultEthernal: Only owner can call this function", async function () {
+        const [deployer, account2, account3] = await ethers.getSigners();
+        const {AddressZero} = ethers.constants
 
-    //     await expect(vaultMintableUSDT.connect(account2).setController(account2.address))
-    //     .to.be.revertedWith("Ownable: caller is not the owner");
+        await expect(vaultMintableUSDT.connect(account2).setController(account2.address))
+        .to.be.revertedWith("Ownable: caller is not the owner");
 
-    //     await expect(vaultMintableUSDT.connect(deployer).setController(AddressZero))
-    //     .to.be.revertedWith("invalid address");
+        await expect(vaultMintableUSDT.connect(deployer).setController(AddressZero))
+        .to.be.revertedWith("invalid address");
 
-    //     await expect(vaultMintableUSDT.connect(account2).setMinDeposit(expandDecimals(1, 18)))
-    //     .to.be.revertedWith("Ownable: caller is not the owner");
+        await expect(vaultMintableUSDT.connect(account2).setMinDeposit(expandDecimals(1, 18)))
+        .to.be.revertedWith("Ownable: caller is not the owner");
 
-    //     await expect(vaultMintableUSDT.connect(account2).setDepositPause(true))
-    //     .to.be.revertedWith("Ownable: caller is not the owner");
-    // });
+        await expect(vaultMintableUSDT.connect(account2).setDepositPause(true))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+    });
 
-    // it("VaultEthernal: Deposit", async function () {
-    //     const [deployer, account2, account3] = await ethers.getSigners();
-    //     const {AddressZero} = ethers.constants
-    //     const amount = expandDecimals(100, 18);
+    it("VaultEthernal: Deposit", async function () {
+        const [deployer, account2, account3] = await ethers.getSigners();
+        const {AddressZero} = ethers.constants
+        const amount = expandDecimals(100, 18);
     
-    //     await vaultEthernalEETH.connect(deployer).setDepositPause(true)
+        await vaultEthernalEETH.connect(deployer).setDepositPause(true)
 
-    //     await expect(vaultEthernalEETH.connect(deployer).deposit(account2.address, expandDecimals(1, 18)))
-    //     .to.be.revertedWith("VaultEthernal: caller is not the controller");
+        await expect(vaultEthernalEETH.connect(deployer).deposit(account2.address, expandDecimals(1, 18)))
+        .to.be.revertedWith("VaultEthernal: caller is not the controller");
 
-    //     await vaultEthernalEETH.connect(deployer).setController(deployer.address)
+        await vaultEthernalEETH.connect(deployer).setController(deployer.address)
 
-    //     await expect(vaultEthernalEETH.connect(deployer).deposit(account2.address, expandDecimals(1, 18)))
-    //     .to.be.revertedWith("Pausable: paused");
+        await expect(vaultEthernalEETH.connect(deployer).deposit(account2.address, expandDecimals(1, 18)))
+        .to.be.revertedWith("Pausable: paused");
 
-    //     await vaultEthernalEETH.connect(deployer).setDepositPause(false)
+        await vaultEthernalEETH.connect(deployer).setDepositPause(false)
 
-    //     await eth.connect(deployer).setController(deployer.address, true);
-    //     await eth.connect(deployer).setController(vaultEthernalEETH.address, true);
-    //     await eth.connect(deployer).mint(deployer.address, amount);
-    //     await eth.connect(deployer).approve(eeth.address, amount);
-    //     await eeth.connect(deployer).deposit(amount);
-    //     await eeth.connect(deployer).transfer(vaultEthernalEETH.address, amount);
+        await eth.connect(deployer).setController(deployer.address, true);
+        await eth.connect(deployer).setController(vaultEthernalEETH.address, true);
+        await eth.connect(deployer).mint(deployer.address, amount);
+        await eth.connect(deployer).approve(eeth.address, amount);
+        await eeth.connect(deployer).deposit(amount);
+        await eeth.connect(deployer).transfer(vaultEthernalEETH.address, amount);
 
-    //     await expect(vaultEthernalEETH.connect(deployer).deposit(account2.address, expandDecimals(1000, 18)))
-    //     .to.be.revertedWith("insufficient amount");
+        await expect(vaultEthernalEETH.connect(deployer).deposit(account2.address, expandDecimals(1000, 18)))
+        .to.be.revertedWith("insufficient amount");
 
-    //     await expect(vaultEthernalEETH.connect(deployer).deposit(account2.address, expandDecimals(1, 18)))
-    //     .to.be.revertedWith("amount too small");
+        await expect(vaultEthernalEETH.connect(deployer).deposit(account2.address, expandDecimals(1, 18)))
+        .to.be.revertedWith("amount too small");
 
-    //     await vaultEthernalEETH.connect(deployer).setMinDeposit(expandDecimals(1, 18))
+        await vaultEthernalEETH.connect(deployer).setMinDeposit(expandDecimals(1, 18))
 
-    //     await vaultEthernalEETH.connect(deployer).deposit(account2.address, amount)
+        await vaultEthernalEETH.connect(deployer).deposit(account2.address, amount)
 
-    //     expect(await eth.balanceOf(vaultEthernalEETH.address)).to.be.equal(0);
-    // });
+        expect(await eth.balanceOf(vaultEthernalEETH.address)).to.be.equal(0);
+    });
 
-    // it("VaultEthernal: Withdraw", async function () {
-    //     const [deployer, account2, account3] = await ethers.getSigners();
-    //     const {AddressZero} = ethers.constants
-    //     const amount = expandDecimals(100, 18);
+    it("VaultEthernal: Withdraw", async function () {
+        const [deployer, account2, account3] = await ethers.getSigners();
+        const {AddressZero} = ethers.constants
+        const amount = expandDecimals(100, 18);
 
-    //     await expect(vaultEthernalEETH.connect(deployer).withdraw(account2.address, amount))
-    //     .to.be.revertedWith("VaultEthernal: caller is not the controller");
+        await expect(vaultEthernalEETH.connect(deployer).withdraw(account2.address, amount))
+        .to.be.revertedWith("VaultEthernal: caller is not the controller");
 
-    //     await vaultEthernalEETH.connect(deployer).setController(deployer.address)
-    //     await eth.connect(deployer).setController(vaultEthernalEETH.address, true);
+        await vaultEthernalEETH.connect(deployer).setController(deployer.address)
+        await eth.connect(deployer).setController(vaultEthernalEETH.address, true);
 
-    //     expect(await eeth.balanceOf(account2.address)).to.be.equal(0);
+        expect(await eeth.balanceOf(account2.address)).to.be.equal(0);
 
-    //     await vaultEthernalEETH.connect(deployer).withdraw(account2.address, amount)
+        await vaultEthernalEETH.connect(deployer).withdraw(account2.address, amount)
 
-    //     expect(await eeth.balanceOf(account2.address)).to.be.equal(amount);
-    // });
+        expect(await eeth.balanceOf(account2.address)).to.be.equal(amount);
+    });
 
-    // it("VaultVenus: Only owner can call this function", async function () {
-    //     const [deployer, account2, account3] = await ethers.getSigners();
-    //     const {AddressZero} = ethers.constants
+    it("VaultVenus: Only owner can call this function", async function () {
+        const [deployer, account2, account3] = await ethers.getSigners();
+        const {AddressZero} = ethers.constants
 
-    //     await expect(vaultVenus.connect(account2).setController(account2.address))
-    //     .to.be.revertedWith("Ownable: caller is not the owner");
+        await expect(vaultVenus.connect(account2).setController(account2.address))
+        .to.be.revertedWith("Ownable: caller is not the owner");
 
-    //     await expect(vaultVenus.connect(deployer).setController(AddressZero))
-    //     .to.be.revertedWith("invalid address");
+        await expect(vaultVenus.connect(deployer).setController(AddressZero))
+        .to.be.revertedWith("invalid address");
 
-    //     await expect(vaultVenus.connect(account2).setMinDeposit(expandDecimals(1, 18)))
-    //     .to.be.revertedWith("Ownable: caller is not the owner");
+        await expect(vaultVenus.connect(account2).setMinDeposit(expandDecimals(1, 18)))
+        .to.be.revertedWith("Ownable: caller is not the owner");
 
-    //     await expect(vaultVenus.connect(account2).setDepositPause(true))
-    //     .to.be.revertedWith("Ownable: caller is not the owner");
-    // });
+        await expect(vaultVenus.connect(account2).setDepositPause(true))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+    });
 
     it("VaultVenus: Deposit & Withdraw", async function () {
         const [deployer, account2, account3] = await ethers.getSigners();
