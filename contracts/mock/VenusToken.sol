@@ -16,6 +16,7 @@ contract VenusToken {
         IERC20(underlyingToken).transferFrom(msg.sender, address(this), mintTokens);
         return 0;
     }
+
     function redeemUnderlying(uint redeemAmount) external returns (uint) {
         IERC20(underlyingToken).transfer(msg.sender, redeemAmount);
         return 0;
