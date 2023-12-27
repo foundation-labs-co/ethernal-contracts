@@ -46,6 +46,12 @@ describe("Ethernal Bridge", function () {
         ethernalBridge = await EthernalBridgeContract.deploy(xOracleMessage.address);
         await ethernalBridge.deployed();
 
+        // set pair tokenIndex
+        for (let i = 0; i < config.pairTokenIndexes.length; i++) {
+            const pairTokenIndex = config.pairTokenIndexes[i]
+            await ethernalBridge.addPairTokenIndex(pairTokenIndex[0], pairTokenIndex[1])
+        }
+
         // Deploy Token
 
         // USDT - EUSDT
@@ -123,6 +129,27 @@ describe("Ethernal Bridge", function () {
         await expect(ethernalBridge.connect(deployer).removeAllowToken(usdt.address))
         .to.be.revertedWith("invalid address");
     });
+    
+    it("Add Pair Token Index", async function () {
+        const [deployer, account2, account3] = await ethers.getSigners();
+        const { AddressZero } = ethers.constants;
+    
+        // Call the addPairTokenIndex function
+        await ethernalBridge.connect(deployer).addPairTokenIndex(1, 2);
+    
+        // Call the addPairTokenIndex function again
+        await expect(ethernalBridge.connect(deployer).addPairTokenIndex(1, 2))
+        .to.be.revertedWith("pair already exists");
+    });
+
+    it("Remove Pair Token Index", async function () {
+        const [deployer, account2, account3] = await ethers.getSigners();
+        const { AddressZero } = ethers.constants;
+    
+        // Call the removePairTokenIndex function
+        await expect(ethernalBridge.connect(deployer).removePairTokenIndex(1, 2))
+        .to.be.revertedWith("pair not exists");
+    });
 
     it("Set XOracle Message", async function () {
         const [deployer, account2, account3] = await ethers.getSigners();
@@ -193,6 +220,13 @@ describe("Ethernal Bridge", function () {
         .to.be.revertedWith("dstTokenIndex not allowed");
 
         await ethernalBridge.connect(deployer).setSupportDstTokenIndex(chainIdBSC, tokenIndexes.USDT, true);
+
+        await ethernalBridge.connect(deployer).removePairTokenIndex(tokenIndexes.EUSDT, tokenIndexes.USDT);
+
+        await expect(ethernalBridge.connect(account2).send(eusdt.address, 0, chainIdBSC, tokenIndexes.USDT, account2.address, {value: fee}))
+        .to.be.revertedWith("pair tokenIndex not allowed");
+
+        await ethernalBridge.connect(deployer).addPairTokenIndex(tokenIndexes.EUSDT, tokenIndexes.USDT);
 
         // set controller for mint usdt
         await usdt.connect(deployer).setController(deployer.address, true);
@@ -291,6 +325,13 @@ describe("Ethernal Bridge", function () {
         .to.be.revertedWith("dstTokenIndex not allowed");
 
         await ethernalBridge.connect(deployer).setSupportDstTokenIndex(chainIdBSC, tokenIndexes.ETH, true);
+
+        await ethernalBridge.connect(deployer).removePairTokenIndex(tokenIndexes.ETH, tokenIndexes.ETH);
+
+        await expect(ethernalBridge.connect(account2).sendETH(chainIdBSC, tokenIndexes.ETH, account2.address, {value: amountWithFee}))
+        .to.be.revertedWith("pair tokenIndex not allowed");
+
+        await ethernalBridge.connect(deployer).addPairTokenIndex(tokenIndexes.ETH, tokenIndexes.ETH);
 
         await vaultETH.connect(deployer).setController(ethernalBridge.address);
 
