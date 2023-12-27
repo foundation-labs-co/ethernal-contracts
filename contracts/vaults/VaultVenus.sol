@@ -9,7 +9,7 @@ import "../interfaces/IVault.sol";
 import "../interfaces/IVToken.sol";
 
 contract VaultVenus is IVault, Ownable, Pausable {
-    uint64 public override chainId;
+    uint64 public immutable override chainId;
     uint256 public override tokenIndex;
     address public override reserveToken;
     uint256 public override minDeposit;
@@ -17,7 +17,7 @@ contract VaultVenus is IVault, Ownable, Pausable {
     address public controller;
 
     modifier onlyController() {
-        require(controller == msg.sender, "onlyController: caller is not the controller" );
+        require(controller == msg.sender, "VaultVenus: caller is not the controller" );
         _;
     }
 
@@ -68,10 +68,10 @@ contract VaultVenus is IVault, Ownable, Pausable {
      * @param _amount amount of ReserveToken
      */
     function withdraw(address _to, uint256 _amount) external override onlyController {
-        uint256 balance = IVToken(reserveToken).balanceOf(address(this));
+        uint256 balance = IERC20(reserveToken).balanceOf(address(this));
 
         // burn
-        IVToken(ibToken).redeem(_amount);
+        IVToken(ibToken).redeemUnderlying(_amount);
         
         uint256 reserveAmount = IERC20(reserveToken).balanceOf(address(this)) - balance;
         IERC20(reserveToken).transfer(_to, reserveAmount);
@@ -79,15 +79,12 @@ contract VaultVenus is IVault, Ownable, Pausable {
         emit Withdraw(_to, _amount);
     }
 
-    function totalBalance() external override view returns (uint256) {
-        return IERC20(reserveToken).balanceOf(address(this));
+    function totalBalance() external override view returns(uint256) {
+        uint256 balance = IERC20(ibToken).balanceOf(address(this));
+        return (balance * 1e38) / IVToken(ibToken).exchangeRateStored();
     }
 
-    function supportTokenIndex(uint256 _tokenIndex) external override view returns (bool) {
-        return tokenIndex == _tokenIndex;
-    }
-
-    function depositPause() external override view returns (bool) {
+    function depositPause() external override view returns(bool) {
         return super.paused();
     }
 
@@ -107,7 +104,7 @@ contract VaultVenus is IVault, Ownable, Pausable {
         emit SetMinDeposit(_minDeposit);
     }
 
-    function setDepositPause(bool _flag) external onlyOwner {
+    function setDepositPause(bool _flag) external onlyOwner() {
         if (_flag) {
             _pause();
         } else {

@@ -17,16 +17,16 @@ const contactAddress = {
   ebnb: deployedAddress['EBNB'],
   eusdt: deployedAddress['EUSDT'],
   eusdc: deployedAddress['EUSDC'],
-  vaultBTC: deployedAddress['VaultMintable BTC'],
-  vaultETH: deployedAddress['VaultMintable ETH'],
-  vaultBNB: deployedAddress['VaultMintable BNB'],
-  vaultUSDT: deployedAddress['VaultMintable USDT'],
-  vaultUSDC: deployedAddress['VaultMintable USDC'],
-  vaultEBTC: deployedAddress['VaultEthernal EBTC'],
-  vaultEETH: deployedAddress['VaultEthernal EETH'],
-  vaultEBNB: deployedAddress['VaultEthernal EBNB'],
-  vaultEUSDT: deployedAddress['VaultEthernal EUSDT'],
-  vaultEUSDC: deployedAddress['VaultEthernal EUSDC'],
+  vaultBTC: deployedAddress['VaultBTC'],
+  vaultETH: deployedAddress['VaultETH'],
+  vaultBNB: deployedAddress['VaultBNB'],
+  vaultUSDT: deployedAddress['VaultUSDT'],
+  vaultUSDC: deployedAddress['VaultUSDC'],
+  vaultEBTC: deployedAddress['VaultEBTC'],
+  vaultEETH: deployedAddress['VaultEETH'],
+  vaultEBNB: deployedAddress['VaultEBNB'],
+  vaultEUSDT: deployedAddress['VaultEUSDT'],
+  vaultEUSDC: deployedAddress['VaultEUSDC'],
   ethernalBridge: deployedAddress['EthernalBridge'],
   ethernalReader: deployedAddress['EthernalReader'],
 }
@@ -117,7 +117,7 @@ function readTmpAddresses() {
 
 function writeTmpAddresses(json) {
   const tmpAddresses = Object.assign(readTmpAddresses(), json)
-  fs.writeFileSync(filePath, JSON.stringify(tmpAddresses))
+  fs.writeFileSync(filePath, JSON.stringify(tmpAddresses, null, 2))
 }
 
 async function sendTxn(txnPromise, label) {
@@ -133,6 +133,7 @@ module.exports = {
   getContractAddress,
   deployContract,
   contractAt,
+  getChainId,
   getFrameSigner,
   writeTmpAddresses,
   readTmpAddresses,

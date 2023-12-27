@@ -9,14 +9,14 @@ import "../interfaces/IVault.sol";
 import "../interfaces/IERC20Mintable.sol";
 
 contract VaultMintable is IVault, Ownable, Pausable {
-    uint64 public override chainId;
+    uint64 public immutable override chainId;
     uint256 public override tokenIndex;
     address public override reserveToken;
     uint256 public override minDeposit;
     address public controller;
 
     modifier onlyController() {
-        require(controller == msg.sender, "onlyController: caller is not the controller" );
+        require(controller == msg.sender, "VaultMintable: caller is not the controller" );
         _;
     }
 
@@ -69,15 +69,11 @@ contract VaultMintable is IVault, Ownable, Pausable {
         emit Withdraw(_to, _amount);
     }
 
-    function totalBalance() external override view returns (uint256) {
+    function totalBalance() external override view returns(uint256) {
         return IERC20(reserveToken).balanceOf(address(this));
     }
 
-    function supportTokenIndex(uint256 _tokenIndex) external override view returns (bool) {
-        return tokenIndex == _tokenIndex;
-    }
-
-    function depositPause() external override view returns (bool) {
+    function depositPause() external override view returns(bool) {
         return super.paused();
     }
 
@@ -97,7 +93,7 @@ contract VaultMintable is IVault, Ownable, Pausable {
         emit SetMinDeposit(_minDeposit);
     }
 
-    function setDepositPause(bool _flag) external onlyOwner {
+    function setDepositPause(bool _flag) external onlyOwner() {
         if (_flag) {
             _pause();
         } else {

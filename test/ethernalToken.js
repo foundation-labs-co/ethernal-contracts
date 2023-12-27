@@ -16,14 +16,14 @@ describe("ERC20 Token and Ethernal Token", function () {
         ERC20Token = await ethers.getContractFactory("ERC20Token");
         EthernalToken = await ethers.getContractFactory("EthernalToken");
 
-        eth = await ERC20Token.deploy("Ethernal-Peg ETH Token", "ETH");
+        eth = await ERC20Token.deploy("ETH (Ethernal)", "ETH");
         await eth.deployed();
-        eeth = await EthernalToken.deploy("Ethernal Wrapped Yield ETH", "EETH", eth.address);
+        eeth = await EthernalToken.deploy("Ethernal Passive Yield ETH", "EETH", eth.address);
         await eeth.deployed();
 
-        usdt = await ERC20Token.deploy("Ethernal-Peg USDT Token", "USDT");
+        usdt = await ERC20Token.deploy("USDT (Ethernal)", "USDT");
         await usdt.deployed();
-        eusdt = await EthernalToken.deploy("Ethernal Wrapped Yield USDT", "EUSDT", usdt.address);
+        eusdt = await EthernalToken.deploy("Ethernal Passive Yield USDT", "EUSDT", usdt.address);
         await eusdt.deployed();
     });
 
@@ -42,10 +42,10 @@ describe("ERC20 Token and Ethernal Token", function () {
         const [deployer, account2, account3] = await ethers.getSigners();
 
         await expect(usdt.connect(account2).mint(account3.address, expandDecimals(100, 18)))
-        .to.be.revertedWith("onlyController: caller is not the controller");
+        .to.be.revertedWith("ERC20Token: caller is not the controller");
         
         await expect(usdt.connect(account2).burn(account3.address, expandDecimals(100, 18)))
-        .to.be.revertedWith("onlyController: caller is not the controller");
+        .to.be.revertedWith("ERC20Token: caller is not the controller");
     });
 
     it("ERC20Token: Mint & Burn ", async function () {
@@ -354,4 +354,3 @@ function bigNumberify(n) {
 function expandDecimals(n, decimals) {
     return bigNumberify(n).mul(bigNumberify(10).pow(decimals))
 }
-

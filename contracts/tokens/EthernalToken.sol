@@ -20,7 +20,7 @@ contract EthernalToken is ERC20, Ownable {
 
     bool public depositPause;
     bool public withdrawPause;
-    uint256 public minAmount = 0.1 * 1e18; // 0.1 reserveToken
+    uint256 public minAmount; // 0 reserveToken
     uint256 public maxAmount = 1000000 * 1e18; // 1,000,000 reserveToken
     address public worker;
     mapping (address => uint256) private userBlock;
@@ -66,7 +66,6 @@ contract EthernalToken is ERC20, Ownable {
         // update balance
         balance = balance + _amount;
 
-        // wrap
         // mint this token to msg.sender
         _mint(msg.sender, _balance);
 
@@ -88,7 +87,6 @@ contract EthernalToken is ERC20, Ownable {
         require(_balance >= minAmount, "amount must higher than min amount");
         require(_balance <= maxAmount, "amount must lower than max amount");
 
-        // unwrap
         // burn this token from msg.sender
         _burn(msg.sender, _amount);
 
@@ -116,16 +114,16 @@ contract EthernalToken is ERC20, Ownable {
     // ------------------------------
     // view
     // ------------------------------
-    function distributionBalance() public view returns (uint256) {
+    function distributionBalance() public view returns(uint256) {
         uint256 _interest = (balance * (block.number - lastBlock) * interestPerBlock) / 1e20;
         return balance + _interest;
     }
 
-    function reserveBalance() public view returns (uint256) {
+    function reserveBalance() public view returns(uint256) {
         return IERC20(reserveToken).balanceOf(address(this));
     }
 
-    function ethernalRatio() public view returns (uint256) {
+    function ethernalRatio() public view returns(uint256) {
         uint256 _supply = totalSupply();
         if (_supply == 0) {
             return 1e18;
@@ -133,11 +131,11 @@ contract EthernalToken is ERC20, Ownable {
         return (distributionBalance() * 1e18) / _supply;
     }
 
-    function reserveToEthernalAmount(uint256 _amount) public view returns (uint256) {
+    function reserveToEthernalAmount(uint256 _amount) public view returns(uint256) {
         return (_amount * 1e18) / ethernalRatio();
     }
 
-    function ethernalToReserveAmount(uint256 _amount) public view returns (uint256) {
+    function ethernalToReserveAmount(uint256 _amount) public view returns(uint256) {
         return (_amount * ethernalRatio()) / 1e18;
     }
 

@@ -10,7 +10,7 @@ import "../interfaces/IERC20Mintable.sol";
 import "../interfaces/IEthernalToken.sol";
 
 contract VaultEthernal is IVault, Ownable, Pausable {
-    uint64 public override chainId;
+    uint64 public immutable override chainId;
     uint256 public override tokenIndex;
     address public override reserveToken;
     uint256 public override minDeposit;
@@ -19,7 +19,7 @@ contract VaultEthernal is IVault, Ownable, Pausable {
     address public controller;
 
     modifier onlyController() {
-        require(controller == msg.sender, "onlyController: caller is not the controller" );
+        require(controller == msg.sender, "VaultEthernal: caller is not the controller" );
         _;
     }
 
@@ -58,7 +58,7 @@ contract VaultEthernal is IVault, Ownable, Pausable {
         uint256 balance = IERC20(ethernalToken).balanceOf(address(this));
         require(balance >= _amount, "insufficient amount");
 
-        // unwrap
+        // withdraw
         uint256 reserveAmount = IEthernalToken(ethernalToken).ethernalToReserveAmount(_amount);
         IEthernalToken(ethernalToken).withdraw(reserveAmount);
 
@@ -78,27 +78,26 @@ contract VaultEthernal is IVault, Ownable, Pausable {
      * @param _amount amount of ReserveToken
      */
     function withdraw(address _to, uint256 _amount) external override onlyController {
-        // mint
+        // mint and approve
         IERC20Mintable(reserveToken).mint(address(this), _amount);
+        IERC20(reserveToken).approve(ethernalToken, _amount);
 
         // deposit
         uint256 balance = IERC20(ethernalToken).balanceOf(address(this));
         IEthernalToken(ethernalToken).deposit(_amount);
         uint256 ethernalAmount = IERC20(ethernalToken).balanceOf(address(this)) - balance;
+
+        // transfer
         IERC20(ethernalToken).transfer(_to, ethernalAmount);
 
         emit Withdraw(_to, _amount);
     }
 
-    function totalBalance() external override view returns (uint256) {
+    function totalBalance() external override view returns(uint256) {
         return IERC20(reserveToken).balanceOf(address(this));
     }
 
-    function supportTokenIndex(uint256 _tokenIndex) external override view returns (bool) {
-        return (tokenIndex == _tokenIndex) || (reserveTokenIndex == _tokenIndex);
-    }
-
-    function depositPause() external override view returns (bool) {
+    function depositPause() external override view returns(bool) {
         return super.paused();
     }
 
@@ -118,7 +117,7 @@ contract VaultEthernal is IVault, Ownable, Pausable {
         emit SetMinDeposit(_minDeposit);
     }
 
-    function setDepositPause(bool _flag) external onlyOwner {
+    function setDepositPause(bool _flag) external onlyOwner() {
         if (_flag) {
             _pause();
         } else {

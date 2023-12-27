@@ -1,33 +1,19 @@
 const { toWei } = require('./scripts/lib/helper')
 
 const networkId = {
-  lineaTestnet: 59140,
+  bscTestnet: 97,
   develop: 1112,
 }
 
-const tokenIndexs = {
+const tokenIndexes = {
+  // Default xOracle Pricefeed
   BTC: 0,
   ETH: 1,
   BNB: 2,
   USDT: 3,
-  BUSD: 4,
   USDC: 5,
-  // DAI: 6,
-  // XRP: 10,
-  // DOGE: 11,
-  // TRX: 12,
-  // ADA: 20,
-  MATIC: 21,
-  // SOL: 22,
-  // DOT: 23,
-  // AVAX: 24,
-  // FTM: 25,
-  // NEAR: 26,
-  // ATOM: 27,
-  OP: 28,
-  ARB: 29,
 
-  // Ethernal Wrap Yield Token
+  // Additional for Ethernal Passive Yield Token
   EBTC: 100,
   EETH: 101,
   EBNB: 102,
@@ -36,88 +22,153 @@ const tokenIndexs = {
 }
 
 const config = {
+  chains: {},
+  pairTokenIndexes: [
+    [tokenIndexes.BTC, tokenIndexes.BTC],
+    [tokenIndexes.BTC, tokenIndexes.EBTC],
+    [tokenIndexes.ETH, tokenIndexes.ETH],
+    [tokenIndexes.ETH, tokenIndexes.EETH],
+    [tokenIndexes.BNB, tokenIndexes.BNB],
+    [tokenIndexes.BNB, tokenIndexes.EBNB],
+    [tokenIndexes.USDT, tokenIndexes.USDT],
+    [tokenIndexes.USDT, tokenIndexes.EUSDT],
+    [tokenIndexes.USDC, tokenIndexes.USDC],
+    [tokenIndexes.USDC, tokenIndexes.EUSDC],
+  ]
+}
+
+config.chains[networkId.bscTestnet] = {
+  xOracleMessage: '0xf533C443902dDb3a385c81aC2dC199B1c612FD0c',
+  ethernalBridge: '0xCC66528B7c47D18990cad559321B791EA8e23600',
+  vaultTokens: [
+    {
+      type: 'VaultVenus',
+      name: 'BTC',
+      tokenIndex: tokenIndexes.BTC,
+      tokenName: 'btc',
+      minDeposit: toWei(`0.00005`),
+      ibToken: '0xfBE6A47711Dbc631693471cDE3e9ee7665ED6381',
+    },
+    {
+      type: 'VaultVenus',
+      name: 'ETH',
+      tokenIndex: tokenIndexes.ETH,
+      tokenName: 'eth',
+      minDeposit: toWei(`0.001`),
+      ibToken: '0x601e29eD938f382c345A22f3F28196d633649E9c',
+    },
+    {
+      type: 'VaultVenusBNB',
+      name: 'BNB',
+      tokenIndex: tokenIndexes.BNB,
+      tokenName: 'bnb',
+      minDeposit: toWei(`0.008`),
+      ibToken: '0x8F55d2beFC176e69893b9B75AA360524AF514CD9',
+    },
+    {
+      type: 'VaultVenus',
+      name: 'USDT',
+      tokenIndex: tokenIndexes.USDT,
+      tokenName: 'usdt',
+      minDeposit: toWei(`1`),
+      ibToken: '0xd5310625A687c802f6247f605F8334C33BE499ea',
+    },
+    {
+      type: 'VaultVenus',
+      name: 'USDC',
+      tokenIndex: tokenIndexes.USDC,
+      tokenName: 'usdc',
+      minDeposit: toWei(`1`),
+      ibToken: '0x280DCe8413fE8986BD38C3f08f1883526E38B857',
+    },
+  ],
+}
+
+config.chains[networkId.develop] = {
+  xOracleMessage: '0xccCd5c5D4e3d2F85d07f041759B96f8b8A622056',
+  ethernalBridge: '0x31B0ee14856bfc5189Ef11584CB3Da557B864a3d',
   vaultTokens: [
     {
       type: 'VaultMintable',
       name: 'BTC',
-      tokenIndex: tokenIndexs.BTC,
+      tokenIndex: tokenIndexes.BTC,
       tokenName: 'btc',
       minDeposit: toWei(`0.00005`),
     },
     {
       type: 'VaultMintable',
       name: 'ETH',
-      tokenIndex: tokenIndexs.ETH,
+      tokenIndex: tokenIndexes.ETH,
       tokenName: 'eth',
       minDeposit: toWei(`0.001`),
     },
     {
       type: 'VaultMintable',
       name: 'BNB',
-      tokenIndex: tokenIndexs.BNB,
+      tokenIndex: tokenIndexes.BNB,
       tokenName: 'bnb',
       minDeposit: toWei(`0.008`),
     },
     {
       type: 'VaultMintable',
       name: 'USDT',
-      tokenIndex: tokenIndexs.USDT,
+      tokenIndex: tokenIndexes.USDT,
       tokenName: 'usdt',
       minDeposit: toWei(`1`),
     },
     {
       type: 'VaultMintable',
       name: 'USDC',
-      tokenIndex: tokenIndexs.USDC,
+      tokenIndex: tokenIndexes.USDC,
       tokenName: 'usdc',
       minDeposit: toWei(`1`),
     },
     {
       type: 'VaultEthernal',
       name: 'EBTC',
-      tokenIndex: tokenIndexs.EBTC,
+      tokenIndex: tokenIndexes.EBTC,
       tokenName: 'btc',
       minDeposit: toWei(`0.00005`),
-      reserveTokenIndex: tokenIndexs.BTC,
+      reserveTokenIndex: tokenIndexes.BTC,
       ethernalTokenName: 'ebtc',
     },
     {
       type: 'VaultEthernal',
       name: 'EETH',
-      tokenIndex: tokenIndexs.EETH,
+      tokenIndex: tokenIndexes.EETH,
       tokenName: 'eth',
       minDeposit: toWei(`0.001`),
-      reserveTokenIndex: tokenIndexs.ETH,
+      reserveTokenIndex: tokenIndexes.ETH,
       ethernalTokenName: 'eeth',
     },
     {
       type: 'VaultEthernal',
       name: 'EBNB',
-      tokenIndex: tokenIndexs.EBNB,
+      tokenIndex: tokenIndexes.EBNB,
       tokenName: 'bnb',
       minDeposit: toWei(`0.008`),
-      reserveTokenIndex: tokenIndexs.BNB,
+      reserveTokenIndex: tokenIndexes.BNB,
       ethernalTokenName: 'ebnb',
     },
     {
       type: 'VaultEthernal',
       name: 'EUSDT',
-      tokenIndex: tokenIndexs.EUSDT,
+      tokenIndex: tokenIndexes.EUSDT,
       tokenName: 'usdt',
       minDeposit: toWei(`1`),
-      reserveTokenIndex: tokenIndexs.USDT,
+      reserveTokenIndex: tokenIndexes.USDT,
       ethernalTokenName: 'eusdt',
     },
     {
       type: 'VaultEthernal',
       name: 'EUSDC',
-      tokenIndex: tokenIndexs.EUSDC,
+      tokenIndex: tokenIndexes.EUSDC,
       tokenName: 'usdc',
       minDeposit: toWei(`1`),
-      reserveTokenIndex: tokenIndexs.USDC,
+      reserveTokenIndex: tokenIndexes.USDC,
       ethernalTokenName: 'eusdc',
     },
   ],
 }
 
-module.exports = { networkId, config }
+module.exports = { networkId, config, tokenIndexes }

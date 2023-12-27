@@ -36,7 +36,7 @@ module.exports = {
   networks: {
     hardhat: {
       forking: {
-        url: `https://develop-chain.0xnode.cloud/`,
+        url: `https://data-seed-prebsc-1-s2.bnbchain.org:8545`,
       },
     },
     bsc: {
@@ -45,11 +45,11 @@ module.exports = {
       gasPrice: 3 * 10 ** 9,
       // accounts: [`0x${process.env.PRIVATE_KEY}`],
     },
-    lineaTestnet: {
-      url: `${process.env.LINEA_TESTNET_RPC}`,
-      chainId: parseInt(`${process.env.LINEA_TESTNET_CHAIN_ID}`),
-      gasPrice: parseInt(`${process.env.LINEA_TESTNET_GAS_PRICE}`) * 10 ** 9,
-      // accounts: [`0x${process.env.PRIVATE_KEY}`],
+    bscTestnet: {
+      url: "https://data-seed-prebsc-1-s2.bnbchain.org:8545",
+      chainId: 97,
+      gasPrice: 10 * 10**9,
+      accounts: [`0x${process.env.PRIVATE_KEY}`],
     },
     develop: {
       url: `https://develop-chain.0xnode.cloud/`,
@@ -60,18 +60,9 @@ module.exports = {
   },
   etherscan: {
     apiKey: {
-      // lineaTestnet: `${process.env.LINEA_TESTNET_APIKEY}`,
       develop: `${process.env.DEVELOP_APIKEY}`,
     },
     customChains: [
-      {
-        network: 'lineaTestnet',
-        chainId: parseInt(`${process.env.LINEA_TESTNET_CHAIN_ID}`),
-        urls: {
-          apiURL: 'https://api-testnet.lineascan.build/api',
-          browserURL: 'https://goerli.lineascan.build/',
-        },
-      },
       {
         network: 'develop',
         chainId: 1112,

@@ -9,11 +9,6 @@ async function main() {
 
   // test reader
   const tokens = [
-    getContractAddress(`ebtc`),
-    getContractAddress(`eeth`),
-    getContractAddress(`ebnb`),
-    getContractAddress(`eusdt`),
-    getContractAddress(`eusdc`),
     getContractAddress(`btc`),
     getContractAddress(`eth`),
     getContractAddress(`bnb`),

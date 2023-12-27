@@ -4,8 +4,8 @@ const { networkId, config } = require('../../../config')
 async function main() {
   let deployer = await getFrameSigner()
 
-  const srcChain = networkId.develop
-  const dstChains = [networkId.bscTestnet]
+  const srcChain = networkId.bscTestnet
+  const dstChains = [networkId.develop]
 
   // deploy new EthernalBridge
   const ethernalBridge = await deployContract(
@@ -14,17 +14,13 @@ async function main() {
     'EthernalBridge',
     deployer
   )
+  // const ethernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
 
   // migrate
   for (let i = 0; i < config.chains[srcChain].vaultTokens.length; i++) {
     const vaultToken = config.chains[srcChain].vaultTokens[i]
+    const tokenAddress = getContractAddress(vaultToken.tokenName)
     const vault = await contractAt(vaultToken.type, getContractAddress(`vault${vaultToken.name}`), deployer)
-    let tokenAddress
-    if (vaultToken.type == 'VaultMintable') {
-      tokenAddress = getContractAddress(vaultToken.tokenName)
-    } else if (vaultToken.type == 'VaultEthernal') {
-      tokenAddress = getContractAddress(vaultToken.ethernalTokenName)
-    }
 
     // set controller
     await sendTxn(vault.setController(ethernalBridge.address), `vault.setController(${ethernalBridge.address})`)

@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "../interfaces/IVaultETH.sol";
 import "../interfaces/IVBNB.sol";
 
-contract VaultVenusBNB is IVaultETH, Ownable, Pausable {
+contract VaultETH is IVaultETH {
     uint64 public immutable override chainId;
     uint256 public override tokenIndex;
     address public override reserveToken;
@@ -17,7 +17,7 @@ contract VaultVenusBNB is IVaultETH, Ownable, Pausable {
     address public controller;
 
     modifier onlyController() {
-        require(controller == msg.sender, "VaultVenusBNB: caller is not the controller" );
+        require(controller == msg.sender, "VaultETH: caller is not the controller" );
         _;
     }
 
@@ -38,7 +38,6 @@ contract VaultVenusBNB is IVaultETH, Ownable, Pausable {
      */
     constructor(uint256 _tokenIndex, address _reserveToken, uint256 _minDeposit, address _ibToken) {
         require(_reserveToken != address(0), "invalid address");
-        require(_ibToken != address(0), "invalid address");
 
         chainId = uint64(block.chainid);
         tokenIndex = _tokenIndex;
@@ -52,13 +51,8 @@ contract VaultVenusBNB is IVaultETH, Ownable, Pausable {
      * @param _from sender address
      * - msg.value is amount of ReserveToken
      */
-    function deposit(address _from) external payable override onlyController whenNotPaused {
-        require(msg.value > minDeposit, "amount too small");
+    function deposit(address _from) external payable override onlyController(){
 
-        // mint
-        IVBNB(ibToken).mint{ value: msg.value }();
-
-        emit Deposit(_from, msg.value);
     }
 
     /**
@@ -66,50 +60,35 @@ contract VaultVenusBNB is IVaultETH, Ownable, Pausable {
      * @param _to receiver address
      * @param _amount amount of ReserveToken
      */
-    function withdraw(address _to, uint256 _amount) external override onlyController {
-        uint256 balance = address(this).balance;
+    function withdraw(address _to, uint256 _amount) external override onlyController(){
 
-        // burn
-        IVBNB(ibToken).redeemUnderlying(_amount);
-        
-        uint256 reserveAmount = address(this).balance - balance;
-        payable(_to).transfer(reserveAmount);
-
-        emit Withdraw(_to, _amount);
     }
 
     function totalBalance() external override view returns(uint256) {
-        uint256 balance = IERC20(ibToken).balanceOf(address(this));
-        return (balance * 1e38) / IVBNB(ibToken).exchangeRateStored();
+        return IERC20(reserveToken).balanceOf(address(this));
     }
 
     function depositPause() external override view returns(bool) {
-        return super.paused();
+
     }
 
     // ------------------------------
     // onlyOwner
     // ------------------------------
-    function setController(address _controller) public onlyOwner() {
+    function setController(address _controller) public {
         require(_controller != address(0), "invalid address");
         controller = _controller;
         
         emit SetController(_controller);
     }
 
-    function setMinDeposit(uint256 _minDeposit) public onlyOwner() {
+    function setMinDeposit(uint256 _minDeposit) public {
         minDeposit = _minDeposit;
 
         emit SetMinDeposit(_minDeposit);
     }
 
-    function setDepositPause(bool _flag) external onlyOwner() {
-        if (_flag) {
-            _pause();
-        } else {
-            _unpause();
-        }
+    function setDepositPause(bool _flag) external  {
 
-        emit SetDepositPause(_flag);
     }
 }
