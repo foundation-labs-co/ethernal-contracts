@@ -193,6 +193,20 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
 
     /**
      * @dev Callback from xOracleMessage (sent from another chain)
+     * @param _payload payload
+     */
+    function xOracleCall(bytes memory _payload) external nonReentrant {
+        // check security callback
+        require(msg.sender == xOracleMessage, "only xOracleMessage callback");
+
+        // decode payload
+        (uint256 _uid, uint256 _srcTokenIndex, uint256 _dstTokenIndex, uint256 _amount, uint64 _srcChainId, uint64 _dstChainId, address _from, address _receiver) = abi.decode(_payload, (uint256, uint256, uint256, uint256, uint64, uint64, address, address));
+        // process receiving
+        receiving(_uid, _srcTokenIndex, _dstTokenIndex, _amount, _srcChainId, _dstChainId, _from, _receiver);
+    } 
+
+    /**
+     * @dev Process receiving bridge data from another chain
      * @param _uid uid
      * @param _srcTokenIndex source tokenIndex
      * @param _dstTokenIndex destination tokenIndex
@@ -211,10 +225,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
         uint64 _dstChainId, 
         address _from, 
         address _receiver
-    ) external nonReentrant {
-        // check security callback
-        require(msg.sender == xOracleMessage, "only xOracleMessage callback");
-
+    ) private {
         require(incomingBridges[_srcChainId][_uid].uid == 0, "already received");
         require(_uid > 0, "invalid uid");
         require(_amount > 0, "invalid amount");

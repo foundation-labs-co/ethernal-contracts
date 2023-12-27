@@ -19,7 +19,7 @@ contract VaultEthernal is IVault, Ownable, Pausable {
     address public controller;
 
     modifier onlyController() {
-        require(controller == msg.sender, "onlyController: caller is not the controller" );
+        require(controller == msg.sender, "VaultEthernal: caller is not the controller" );
         _;
     }
 

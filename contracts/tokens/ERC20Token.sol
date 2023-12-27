@@ -12,7 +12,7 @@ contract ERC20Token is ERC20, Ownable {
     }
 
     modifier onlyController() {
-        require(controllers[msg.sender], "onlyController: caller is not the controller");
+        require(controllers[msg.sender], "ERC20Token: caller is not the controller");
         _;
     }
     

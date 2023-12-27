@@ -17,7 +17,7 @@ contract VaultVenusBNB is IVaultETH, Ownable, Pausable {
     address public controller;
 
     modifier onlyController() {
-        require(controller == msg.sender, "onlyController: caller is not the controller" );
+        require(controller == msg.sender, "VaultVenusBNB: caller is not the controller" );
         _;
     }
 

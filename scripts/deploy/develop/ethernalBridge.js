@@ -24,7 +24,7 @@ async function main() {
       vault = await deployContract(
         'VaultMintable',
         [vaultToken.tokenIndex, getContractAddress(vaultToken.tokenName), vaultToken.minDeposit],
-        `VaultMintable ${vaultToken.name}`,
+        `Vault${vaultToken.name}`,
         deployer
       )
       tokenAddress = getContractAddress(vaultToken.tokenName)
@@ -38,7 +38,7 @@ async function main() {
           vaultToken.reserveTokenIndex,
           getContractAddress(vaultToken.ethernalTokenName),
         ],
-        `VaultEthernal ${vaultToken.name}`,
+        `Vault${vaultToken.name}`,
         deployer
       )
       tokenAddress = getContractAddress(vaultToken.ethernalTokenName)
@@ -47,6 +47,12 @@ async function main() {
     // set controller
     await sendTxn(vault.setController(ethernalBridge.address), `vault.setController(${ethernalBridge.address})`)
 
+    const isExist = await ethernalBridge.tokenVaults(tokenAddress)
+    if (isExist != '0x0000000000000000000000000000000000000000') {
+      // removeAllowToken
+      await sendTxn(ethernalBridge.removeAllowToken(tokenAddress), `ethernalBridge.removeAllowToken(${tokenAddress})`)
+    }
+    
     // addAllowTokens
     await sendTxn(
       ethernalBridge.addAllowToken(tokenAddress, vault.address),

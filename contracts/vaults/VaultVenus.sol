@@ -17,7 +17,7 @@ contract VaultVenus is IVault, Ownable, Pausable {
     address public controller;
 
     modifier onlyController() {
-        require(controller == msg.sender, "onlyController: caller is not the controller" );
+        require(controller == msg.sender, "VaultVenus: caller is not the controller" );
         _;
     }
 

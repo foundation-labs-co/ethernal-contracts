@@ -8,12 +8,13 @@ async function main() {
   const dstChains = [networkId.develop]
 
   // deploy new EthernalBridge
-  const ethernalBridge = await deployContract(
-    'EthernalBridge',
-    [config.chains[srcChain].xOracleMessage],
-    'EthernalBridge',
-    deployer
-  )
+  // const ethernalBridge = await deployContract(
+  //   'EthernalBridge',
+  //   [config.chains[srcChain].xOracleMessage],
+  //   'EthernalBridge',
+  //   deployer
+  // )
+  const ethernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
 
   // migrate
   for (let i = 0; i < config.chains[srcChain].vaultTokens.length; i++) {

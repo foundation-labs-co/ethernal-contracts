@@ -27,7 +27,7 @@ const config = {
 
 config.chains[networkId.bscTestnet] = {
   xOracleMessage: '0xf533C443902dDb3a385c81aC2dC199B1c612FD0c',
-  ethernalBridge: '0xf33Bb4361935B60686552143277ADb584C2Cb980',
+  ethernalBridge: '0xb33880aF331E992aFaF41C69844dE3716B7193D9',
   vaultTokens: [
     {
       type: 'VaultVenus',
@@ -35,7 +35,7 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.BTC,
       tokenName: 'btc',
       minDeposit: toWei(`0.00005`),
-      ibToken: '0x5BbDF7bf9e62d0A2E3e23d1828e2559A371612d1',
+      ibToken: '0xfBE6A47711Dbc631693471cDE3e9ee7665ED6381',
     },
     {
       type: 'VaultVenus',
@@ -43,7 +43,7 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.ETH,
       tokenName: 'eth',
       minDeposit: toWei(`0.001`),
-      ibToken: '0xD8F80AbeA5F19b67f7BA092E4968728f965CCB72',
+      ibToken: '0x601e29eD938f382c345A22f3F28196d633649E9c',
     },
     {
       type: 'VaultVenusBNB',
@@ -51,7 +51,7 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.BNB,
       tokenName: 'bnb',
       minDeposit: toWei(`0.008`),
-      ibToken: '0x1Dd62a284c7eFb92873EC47696Fd4402037b8817',
+      ibToken: '0x8F55d2beFC176e69893b9B75AA360524AF514CD9',
     },
     {
       type: 'VaultVenus',
@@ -59,7 +59,7 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.USDT,
       tokenName: 'usdt',
       minDeposit: toWei(`1`),
-      ibToken: '0x5438490cedE2D3a1b20646b9F42925bf9BB20C71',
+      ibToken: '0xd5310625A687c802f6247f605F8334C33BE499ea',
     },
     {
       type: 'VaultVenus',
@@ -67,14 +67,14 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.USDC,
       tokenName: 'usdc',
       minDeposit: toWei(`1`),
-      ibToken: '0xdAbe894f8A61e16330fb77D803A25F49A20b271E',
+      ibToken: '0x280DCe8413fE8986BD38C3f08f1883526E38B857',
     },
   ],
 }
 
 config.chains[networkId.develop] = {
   xOracleMessage: '0xccCd5c5D4e3d2F85d07f041759B96f8b8A622056',
-  ethernalBridge: '0xd554107f688B96F6cDE9730b01d0F0DE6693D29b',
+  ethernalBridge: '0x5d2e9cF6dbA2e26b9E2C55DB10A787B75a9a758d',
   vaultTokens: [
     {
       type: 'VaultMintable',

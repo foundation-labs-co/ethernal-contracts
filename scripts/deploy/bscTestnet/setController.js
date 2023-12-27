@@ -10,9 +10,9 @@ async function main() {
   for (let i = 0; i < config.chains[srcChain].vaultTokens.length; i++) {
     const vaultToken = config.chains[srcChain].vaultTokens[i]
     
-    if (vaultToken.type == 'VaultVenus') {
+    if (vaultToken.type == 'VaultVenus' || vaultToken.type == 'VaultVenusBNB') {
       const token = await contractAt('ERC20Token', getContractAddress(vaultToken.tokenName), deployer)
-      const vault = getContractAddress(`vaultVenus${vaultToken.name}`)
+      const vault = getContractAddress(`vault${vaultToken.name}`)
       const ibToken = vaultToken.ibToken
 
       // set controller

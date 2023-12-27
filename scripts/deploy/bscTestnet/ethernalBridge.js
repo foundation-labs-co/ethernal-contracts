@@ -1,5 +1,6 @@
 const { deployContract, contractAt, getContractAddress, sendTxn, getFrameSigner } = require('../../lib/deploy')
 const { networkId, config } = require('../../../config')
+const { toWei } = require('../../lib/helper')
 
 async function main() {
   let deployer = await getFrameSigner()
@@ -8,13 +9,13 @@ async function main() {
   const dstChains = [networkId.develop]
 
   // deploy EthernalBridge
-  const ethernalBridge = await deployContract(
-    'EthernalBridge',
-    [config.chains[srcChain].xOracleMessage],
-    'EthernalBridge',
-    deployer
-  )
-  // const ethernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
+  // const ethernalBridge = await deployContract(
+  //   'EthernalBridge',
+  //   [config.chains[srcChain].xOracleMessage],
+  //   'EthernalBridge',
+  //   deployer
+  // )
+  const ethernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
 
   // deploy Vaults
   for (let i = 0; i < config.chains[srcChain].vaultTokens.length; i++) {
@@ -23,12 +24,19 @@ async function main() {
     const vault = await deployContract(
       vaultToken.type,
       [vaultToken.tokenIndex, getContractAddress(vaultToken.tokenName), vaultToken.minDeposit, vaultToken.ibToken],
-      `${vaultToken.type} ${vaultToken.name}`,
+      `Vault${vaultToken.name}`,
       deployer
     )
+    // const vault = await contractAt(vaultToken.type, getContractAddress(`vault${vaultToken.name}`), deployer)
 
     // set controller
     await sendTxn(vault.setController(ethernalBridge.address), `vault.setController(${ethernalBridge.address})`)
+
+    const isExist = await ethernalBridge.tokenVaults(tokenAddress)
+    if (isExist != '0x0000000000000000000000000000000000000000') {
+      // removeAllowToken
+      await sendTxn(ethernalBridge.removeAllowToken(tokenAddress), `ethernalBridge.removeAllowToken(${tokenAddress})`)
+    }
 
     // addAllowTokens
     await sendTxn(
