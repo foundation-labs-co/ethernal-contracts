@@ -23,11 +23,23 @@ const tokenIndexes = {
 
 const config = {
   chains: {},
+  pairTokenIndexes: [
+    [tokenIndexes.BTC, tokenIndexes.BTC],
+    [tokenIndexes.BTC, tokenIndexes.EBTC],
+    [tokenIndexes.ETH, tokenIndexes.ETH],
+    [tokenIndexes.ETH, tokenIndexes.EETH],
+    [tokenIndexes.BNB, tokenIndexes.BNB],
+    [tokenIndexes.BNB, tokenIndexes.EBNB],
+    [tokenIndexes.USDT, tokenIndexes.USDT],
+    [tokenIndexes.USDT, tokenIndexes.EUSDT],
+    [tokenIndexes.USDC, tokenIndexes.USDC],
+    [tokenIndexes.USDC, tokenIndexes.EUSDC],
+  ]
 }
 
 config.chains[networkId.bscTestnet] = {
   xOracleMessage: '0xf533C443902dDb3a385c81aC2dC199B1c612FD0c',
-  ethernalBridge: '0xb33880aF331E992aFaF41C69844dE3716B7193D9',
+  ethernalBridge: '0xCC66528B7c47D18990cad559321B791EA8e23600',
   vaultTokens: [
     {
       type: 'VaultVenus',
@@ -74,7 +86,7 @@ config.chains[networkId.bscTestnet] = {
 
 config.chains[networkId.develop] = {
   xOracleMessage: '0xccCd5c5D4e3d2F85d07f041759B96f8b8A622056',
-  ethernalBridge: '0x5d2e9cF6dbA2e26b9E2C55DB10A787B75a9a758d',
+  ethernalBridge: '0x31B0ee14856bfc5189Ef11584CB3Da557B864a3d',
   vaultTokens: [
     {
       type: 'VaultMintable',

@@ -20,7 +20,7 @@ contract EthernalToken is ERC20, Ownable {
 
     bool public depositPause;
     bool public withdrawPause;
-    uint256 public minAmount = 0.1 * 1e18; // 0.1 reserveToken
+    uint256 public minAmount; // 0 reserveToken
     uint256 public maxAmount = 1000000 * 1e18; // 1,000,000 reserveToken
     address public worker;
     mapping (address => uint256) private userBlock;

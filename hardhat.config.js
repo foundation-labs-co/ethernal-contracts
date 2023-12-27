@@ -36,7 +36,7 @@ module.exports = {
   networks: {
     hardhat: {
       forking: {
-        url: `https://develop-chain.0xnode.cloud/`,
+        url: `https://data-seed-prebsc-1-s2.bnbchain.org:8545`,
       },
     },
     bsc: {
@@ -46,7 +46,7 @@ module.exports = {
       // accounts: [`0x${process.env.PRIVATE_KEY}`],
     },
     bscTestnet: {
-      url: "https://bsc-testnet.blockpi.network/v1/rpc/public",
+      url: "https://data-seed-prebsc-1-s2.bnbchain.org:8545",
       chainId: 97,
       gasPrice: 10 * 10**9,
       accounts: [`0x${process.env.PRIVATE_KEY}`],

@@ -8,13 +8,13 @@ async function main() {
   const dstChains = [networkId.develop]
 
   // deploy new EthernalBridge
-  // const ethernalBridge = await deployContract(
-  //   'EthernalBridge',
-  //   [config.chains[srcChain].xOracleMessage],
-  //   'EthernalBridge',
-  //   deployer
-  // )
-  const ethernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
+  const ethernalBridge = await deployContract(
+    'EthernalBridge',
+    [config.chains[srcChain].xOracleMessage],
+    'EthernalBridge',
+    deployer
+  )
+  // const ethernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
 
   // migrate
   for (let i = 0; i < config.chains[srcChain].vaultTokens.length; i++) {
@@ -42,6 +42,15 @@ async function main() {
         `ethernalBridge.setSupportDstTokenIndex(${dstChain}, ${vaultToken.tokenIndex}, true)`
       )
     }
+  }
+
+  // set pair tokenIndex
+  for (let i = 0; i < config.pairTokenIndexes.length; i++) {
+    const pairTokenIndex = config.pairTokenIndexes[i]
+    await sendTxn(
+      ethernalBridge.addPairTokenIndex(pairTokenIndex[0], pairTokenIndex[1]),
+      `ethernalBridge.addPairTokenIndex(${pairTokenIndex[0]}, ${pairTokenIndex[1]})`
+    )
   }
 }
 
