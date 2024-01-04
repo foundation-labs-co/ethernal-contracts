@@ -51,7 +51,7 @@ contract VaultEthernal is IVault, Ownable, Pausable {
      * @param _from sender address
      * @param _amount amount of EthernalToken
      */
-    function deposit(address _from, uint256 _amount) external override onlyController whenNotPaused {
+    function deposit(address _from, uint256 _amount) external override onlyController whenNotPaused returns(uint256) {
         uint256 balance = IERC20(ethernalToken).balanceOf(address(this));
         require(balance >= _amount, "insufficient amount");
 
@@ -65,6 +65,7 @@ contract VaultEthernal is IVault, Ownable, Pausable {
         IERC20Mintable(reserveToken).burn(address(this), reserveAmount);
 
         emit Deposit(_from, _amount);
+        return reserveAmount;
     }
 
     /**

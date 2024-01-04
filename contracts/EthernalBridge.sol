@@ -116,7 +116,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
         // deposit to vault
         uint256 srcTokenIndex = vault.tokenIndex();
         IERC20(_token).safeTransferFrom(msg.sender, address(vault), _amount);
-        vault.deposit(msg.sender, _amount);
+        _amount = vault.deposit(msg.sender, _amount);
 
         // save user bridge outgoing
         uid++;
@@ -172,7 +172,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
 
         // deposit ETH to vault
         uint256 srcTokenIndex = vault.tokenIndex();
-        vault.deposit{ value: amount }(msg.sender);
+        amount = vault.deposit{ value: amount }(msg.sender); // reuse var amount for avoid stack too deep
 
         // save user bridge outgoing
         uid++;

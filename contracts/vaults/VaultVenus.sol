@@ -50,7 +50,7 @@ contract VaultVenus is IVault, Ownable, Pausable {
      * @param _from sender address
      * @param _amount amount of ReserveToken
      */
-    function deposit(address _from, uint256 _amount) external override  onlyController whenNotPaused {
+    function deposit(address _from, uint256 _amount) external override  onlyController whenNotPaused returns(uint256) {
         uint256 balance = IERC20(reserveToken).balanceOf(address(this));
         require(_amount > minDeposit, "amount too small");
         require(balance >= _amount, "insufficient amount");
@@ -60,6 +60,7 @@ contract VaultVenus is IVault, Ownable, Pausable {
         IVToken(ibToken).mint(_amount);
 
         emit Deposit(_from, _amount);
+        return _amount;
     }
 
     /**

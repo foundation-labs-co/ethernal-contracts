@@ -52,13 +52,14 @@ contract VaultVenusBNB is IVaultETH, Ownable, Pausable {
      * @param _from sender address
      * - msg.value is amount of ReserveToken
      */
-    function deposit(address _from) external payable override onlyController whenNotPaused {
+    function deposit(address _from) external payable override onlyController whenNotPaused returns(uint256) {
         require(msg.value > minDeposit, "amount too small");
 
         // mint
         IVBNB(ibToken).mint{ value: msg.value }();
 
         emit Deposit(_from, msg.value);
+        return msg.value;
     }
 
     /**
