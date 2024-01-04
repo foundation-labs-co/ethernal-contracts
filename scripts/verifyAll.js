@@ -62,7 +62,6 @@ function makeParameter(name) {
       vaultToken.tokenIndex,
       getContractAddress(vaultToken.tokenName),
       vaultToken.minDeposit,
-      vaultToken.reserveTokenIndex,
       getContractAddress(vaultToken.ethernalTokenName),
     ]
   } else if (name == 'VaultEthernal EETH') {
@@ -71,7 +70,6 @@ function makeParameter(name) {
       vaultToken.tokenIndex,
       getContractAddress(vaultToken.tokenName),
       vaultToken.minDeposit,
-      vaultToken.reserveTokenIndex,
       getContractAddress(vaultToken.ethernalTokenName),
     ]
   } else if (name == 'VaultEthernal EBNB') {
@@ -80,7 +78,6 @@ function makeParameter(name) {
       vaultToken.tokenIndex,
       getContractAddress(vaultToken.tokenName),
       vaultToken.minDeposit,
-      vaultToken.reserveTokenIndex,
       getContractAddress(vaultToken.ethernalTokenName),
     ]
   } else if (name == 'VaultEthernal EUSDT') {
@@ -89,7 +86,6 @@ function makeParameter(name) {
       vaultToken.tokenIndex,
       getContractAddress(vaultToken.tokenName),
       vaultToken.minDeposit,
-      vaultToken.reserveTokenIndex,
       getContractAddress(vaultToken.ethernalTokenName),
     ]
   } else if (name == 'VaultEthernal EUSDC') {
@@ -98,7 +94,6 @@ function makeParameter(name) {
       vaultToken.tokenIndex,
       getContractAddress(vaultToken.tokenName),
       vaultToken.minDeposit,
-      vaultToken.reserveTokenIndex,
       getContractAddress(vaultToken.ethernalTokenName),
     ]
   } else if (name == 'EthernalReader') {

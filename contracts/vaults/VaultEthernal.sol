@@ -14,7 +14,6 @@ contract VaultEthernal is IVault, Ownable, Pausable {
     uint256 public override tokenIndex;
     address public override reserveToken;
     uint256 public override minDeposit;
-    uint256 public reserveTokenIndex;
     address public ethernalToken;
     address public controller;
 
@@ -34,10 +33,9 @@ contract VaultEthernal is IVault, Ownable, Pausable {
      * @param _tokenIndex token index for ethernal token
      * @param _reserveToken reserve token address of ethernal token
      * @param _minDeposit minimum deposit amount
-     * @param _reserveTokenIndex reserve token index
      * @param _ethernalToken ethernal token address
      */
-    constructor(uint256 _tokenIndex, address _reserveToken, uint256 _minDeposit, uint256 _reserveTokenIndex, address _ethernalToken) {
+    constructor(uint256 _tokenIndex, address _reserveToken, uint256 _minDeposit, address _ethernalToken) {
         require(_reserveToken != address(0), "invalid address");
         require(_ethernalToken != address(0), "invalid address");
 
@@ -45,7 +43,6 @@ contract VaultEthernal is IVault, Ownable, Pausable {
         tokenIndex = _tokenIndex;
         reserveToken = _reserveToken;
         minDeposit = _minDeposit;
-        reserveTokenIndex = _reserveTokenIndex;
         ethernalToken = _ethernalToken;
     }
 
@@ -59,15 +56,13 @@ contract VaultEthernal is IVault, Ownable, Pausable {
         require(balance >= _amount, "insufficient amount");
 
         // withdraw
-        uint256 reserveAmount = IEthernalToken(ethernalToken).ethernalToReserveAmount(_amount);
-        IEthernalToken(ethernalToken).withdraw(reserveAmount);
-
         uint256 reserveBalance = IERC20(reserveToken).balanceOf(address(this));
+        IEthernalToken(ethernalToken).withdraw(_amount);
+        uint256 reserveAmount = IERC20(reserveToken).balanceOf(address(this)) - reserveBalance;
         require(reserveAmount > minDeposit, "amount too small");
-        require(reserveBalance >= reserveAmount, "insufficient amount");
 
         // burn
-        IERC20Mintable(reserveToken).burn(address(this), reserveBalance);
+        IERC20Mintable(reserveToken).burn(address(this), reserveAmount);
 
         emit Deposit(_from, _amount);
     }

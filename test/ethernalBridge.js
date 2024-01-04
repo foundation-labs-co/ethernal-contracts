@@ -70,7 +70,7 @@ describe("Ethernal Bridge", function () {
         vaultMintableUSDT = await VaultMintable.deploy(tokenIndexes.USDT, usdt.address, expandDecimals(1, 18));
         await vaultMintableUSDT.deployed();
 
-        vaultEthernalEUSDT = await VaultEthernal.deploy(tokenIndexes.EUSDT, usdt.address, expandDecimals(1, 18), tokenIndexes.USDT, eusdt.address);
+        vaultEthernalEUSDT = await VaultEthernal.deploy(tokenIndexes.EUSDT, usdt.address, expandDecimals(1, 18), eusdt.address);
         await vaultEthernalEUSDT.deployed();
 
         // Deploy Vault ETH 

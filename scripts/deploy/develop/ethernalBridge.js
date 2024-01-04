@@ -35,7 +35,6 @@ async function main() {
           vaultToken.tokenIndex,
           getContractAddress(vaultToken.tokenName),
           vaultToken.minDeposit,
-          vaultToken.reserveTokenIndex,
           getContractAddress(vaultToken.ethernalTokenName),
         ],
         `Vault${vaultToken.name}`,
