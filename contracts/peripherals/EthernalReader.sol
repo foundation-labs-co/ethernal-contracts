@@ -8,6 +8,7 @@ interface IEthernalBridge {
     function getTokenPause(address token) external view returns(bool);
     function getTokenVault(address token) external view returns(address);
     function getTokenIndexVault(uint256 tokenIndex) external view returns(address);
+    function getFaucet() external view returns(uint256);
 }
 
 interface IVault {
@@ -93,12 +94,14 @@ contract EthernalReader {
         bool isPause,
         bool isEthernalToken,
         uint256 apr,
-        uint256 exchangeRate
+        uint256 exchangeRate,
+        uint256 faucet
     ) {
         // get vault
         address vault = IEthernalBridge(_ethernalBridge).getTokenVault(_token);
         minAmount = IVault(vault).minDeposit();
         isPause = IVault(vault).depositPause();
+        faucet = IEthernalBridge(_ethernalBridge).getFaucet();
 
         // check if reserveToken != token, it's ethernal token
         isEthernalToken = IVault(vault).reserveToken() != _token;
