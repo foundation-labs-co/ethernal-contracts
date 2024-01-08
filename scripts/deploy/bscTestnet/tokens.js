@@ -8,14 +8,14 @@ async function main() {
     const interestPerBlock = Math.round(0.1 * (365*24*60*60 / 3));
     
     // ERC20Token
-    // const btc = await deployContract('ERC20Token', ['BTC (Ethernal)', 'BTC'], 'BTC', deployer)
-    // const eth = await deployContract('ERC20Token', ['ETH (Ethernal)', 'ETH'], 'ETH', deployer)
-    // const bnb = { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' }
-    // writeTmpAddresses({
-    //   ['BNB']: bnb.address,
-    // })
-    // const usdt = await deployContract('ERC20Token', ['USDT (Ethernal)', 'USDT'], 'USDT', deployer)
-    // const usdc = await deployContract('ERC20Token', ['USDC (Ethernal)', 'USDC'], 'USDC', deployer)
+    const btc = await deployContract('ERC20Token', ['BTC (Ethernal)', 'BTC'], 'BTC', deployer)
+    const eth = await deployContract('ERC20Token', ['ETH (Ethernal)', 'ETH'], 'ETH', deployer)
+    const bnb = { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' }
+    writeTmpAddresses({
+      ['BNB']: bnb.address,
+    })
+    const usdt = await deployContract('ERC20Token', ['USDT (Ethernal)', 'USDT'], 'USDT', deployer)
+    const usdc = await deployContract('ERC20Token', ['USDC (Ethernal)', 'USDC'], 'USDC', deployer)
 
     // ibToken
     const vbtc = await deployContract('VToken', ['Venus BTC', 'VBTC', getContractAddress('btc'), interestPerBlock], 'VBTC', deployer)

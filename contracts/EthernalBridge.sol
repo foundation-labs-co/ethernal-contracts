@@ -6,9 +6,10 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "./interfaces/IXOracleMessage.sol";
 import "./interfaces/IVault.sol";
 import "./interfaces/IVaultETH.sol";
-import "./interfaces/IXOracleMessage.sol";
+import "./interfaces/IFaucetFund.sol";
 
 contract EthernalBridge is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
@@ -29,6 +30,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
     uint64 public immutable chainId;
     address public constant ETH_TOKEN = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address public xOracleMessage;
+    address public faucetFund;
     uint256 public uid; // uid counter for outgoing, start with 1
     
     mapping (address => address) public tokenVaults; // token => vault
@@ -78,6 +80,7 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
     event SetXOracleMessage(address indexed xOracleMessage);
     event SetEndpoint(uint64 indexed dstChainId, address indexed endpoint);
     event SetSupportDstTokenIndex(uint64 indexed dstChainId, uint256 indexed tokenIndex, bool support);
+    event SetFaucetFund(address indexed faucetFund);
 
     constructor(address _xOracleMessage) {
         require(_xOracleMessage != address(0), "invalid address");
@@ -258,6 +261,11 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
         // withdraw to receiver
         IVault(vault).withdraw(_receiver, _amount);
 
+        // faucet
+        if (getFaucet() > 0) {
+            IFaucetFund(faucetFund).transferTo(_receiver);
+        }
+
         emit Receive(_uid, _srcTokenIndex, _dstTokenIndex, _amount, _srcChainId, _dstChainId, _from, _receiver);
     }
 
@@ -349,6 +357,13 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
         emit SetSupportDstTokenIndex(_dstChainId, _tokenIndex, _support);
     }
 
+    function setFaucetFund(address _faucetFund) external onlyOwner() {
+        // allow set faucetFund to address(0)
+        faucetFund = _faucetFund;
+
+        emit SetFaucetFund(_faucetFund);
+    }
+
     // ------------------------------
     // view function
     // ------------------------------
@@ -375,6 +390,19 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
 
     function getBridgeFee(uint64 _dstChainId) public view returns(uint256) {
         return IXOracleMessage(xOracleMessage).getFee(_dstChainId);
+    }
+
+    function getFaucet() public view returns(uint256) {
+        if (faucetFund == address(0)) {
+            return 0;
+        }
+
+        uint256 faucet = IFaucetFund(faucetFund).faucet();
+        uint256 balance = IFaucetFund(faucetFund).balance();
+        if (faucet <= balance) {
+            return faucet;
+        }
+        return 0;
     }
 
     function getOutgoingBridge(uint256 _uid) external view returns(

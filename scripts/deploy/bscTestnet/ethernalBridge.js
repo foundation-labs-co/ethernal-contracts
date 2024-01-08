@@ -7,6 +7,7 @@ async function main() {
 
   const srcChain = networkId.bscTestnet
   const dstChains = [networkId.develop]
+  const isFaucetAvailable = +config.chains[srcChain].faucet > 0
 
   // deploy EthernalBridge
   const ethernalBridge = await deployContract(
@@ -64,6 +65,13 @@ async function main() {
       ethernalBridge.addPairTokenIndex(pairTokenIndex[0], pairTokenIndex[1]),
       `ethernalBridge.addPairTokenIndex(${pairTokenIndex[0]}, ${pairTokenIndex[1]})`
     )
+  }
+
+  // set faucetFund
+  if (isFaucetAvailable) {
+    const faucetFund = await contractAt('FaucetFund', getContractAddress(`faucetFund`), deployer)
+    await sendTxn(ethernalBridge.setFaucetFund(faucetFund.address), `ethernalBridge.setFaucetFund(${faucetFund.address})`)
+    await sendTxn(faucetFund.addPool(ethernalBridge.address), `faucetFund.addPool(${ethernalBridge.address})`)
   }
 }
 

@@ -6,6 +6,10 @@ async function main() {
 
   const srcChain = networkId.develop
   const dstChains = [networkId.bscTestnet]
+  const isFaucetAvailable = +config.chains[srcChain].faucet > 0
+
+  // prev EthernalBridge
+  const prevEthernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
 
   // deploy new EthernalBridge
   const ethernalBridge = await deployContract(
@@ -14,6 +18,7 @@ async function main() {
     'EthernalBridge',
     deployer
   )
+  // const ethernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
 
   // migrate
   for (let i = 0; i < config.chains[srcChain].vaultTokens.length; i++) {
@@ -55,6 +60,16 @@ async function main() {
       ethernalBridge.addPairTokenIndex(pairTokenIndex[0], pairTokenIndex[1]),
       `ethernalBridge.addPairTokenIndex(${pairTokenIndex[0]}, ${pairTokenIndex[1]})`
     )
+  } 
+
+  // set faucetFund
+  if (isFaucetAvailable) {
+    const faucetFund = await contractAt('FaucetFund', getContractAddress(`faucetFund`), deployer)
+    await sendTxn(ethernalBridge.setFaucetFund(faucetFund.address), `ethernalBridge.setFaucetFund(${faucetFund.address})`)
+    await sendTxn(faucetFund.addPool(ethernalBridge.address), `faucetFund.addPool(${ethernalBridge.address})`)
+
+    // remove prevEthernalBridge
+    await sendTxn(faucetFund.removePool(prevEthernalBridge.address), `faucetFund.removePool(${prevEthernalBridge.address})`)
   }
 }
 

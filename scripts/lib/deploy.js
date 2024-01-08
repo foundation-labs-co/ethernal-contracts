@@ -29,6 +29,7 @@ const contactAddress = {
   vaultEUSDC: deployedAddress['VaultEUSDC'],
   ethernalBridge: deployedAddress['EthernalBridge'],
   ethernalReader: deployedAddress['EthernalReader'],
+  faucetFund: deployedAddress['FaucetFund'],
 }
 
 function getContractAddress(name) {
