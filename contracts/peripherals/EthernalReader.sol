@@ -60,7 +60,7 @@ contract EthernalReader {
             // check if reserveToken != token, it's ethernal token
             bool isEthernalToken = IVault(vault).reserveToken() != token;
             uint256 apr = 0;
-            uint256 exchangeRate = 1;
+            uint256 exchangeRate = 1e18;
             uint256 reserveBalance = balance;
             
             if (isEthernalToken) {
@@ -105,7 +105,7 @@ contract EthernalReader {
 
         // check if reserveToken != token, it's ethernal token
         isEthernalToken = IVault(vault).reserveToken() != _token;
-        exchangeRate = 1;
+        exchangeRate = 1e18;
 
         if (isEthernalToken) {
             address ethernalToken = IVaultEthernal(vault).ethernalToken();
