@@ -1,21 +1,26 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
-const crypto = require('crypto')
 const { config, tokenIndexes, networkId } = require('../config')
 
 const abiCoder = new ethers.utils.AbiCoder()
 
 describe("Ethernal Bridge", function () {
     let EthernalBridgeContract
-
     let ethernalBridge
 
-    let VaultMintable
+    let MockXOracleMessage
+    let xOracleMessage
 
+    let FaucetFund
+    let faucetFund
+
+    let ERC20Token
+    let EthernalToken
+
+    let usdt
+    let eusdt
+    
     let VaultEthernal
-
-    let vaultMintableUSDT
-
     let vaultEthernalEUSDT
 
     const fee = expandDecimals(1,15); // 0.001 ETH
@@ -67,7 +72,6 @@ describe("Ethernal Bridge", function () {
         // Deploy Faucet
         faucetFund = await FaucetFund.deploy();
         await faucetFund.deployed();
-
     });
 
     it("Only owner can call this function", async function () {
@@ -109,7 +113,6 @@ describe("Ethernal Bridge", function () {
 
     it("Remove Pool", async function () {
         const [deployer, account2, account3, pool] = await ethers.getSigners();
-        const {AddressZero} = ethers.constants
 
         await expect(faucetFund.connect(deployer).removePool(pool.address))
         .to.be.revertedWith("pool not exist")
@@ -121,7 +124,7 @@ describe("Ethernal Bridge", function () {
         expect(await faucetFund.pools(pool.address)).to.equal(false);
     });
 
-    it("Rescure Fund", async function () {
+    it("Rescue Fund", async function () {
         const [deployer, account2, account3, pool] = await ethers.getSigners();
 
         // send ETH to FaucetFund
@@ -148,11 +151,11 @@ describe("Ethernal Bridge", function () {
 
     it("Transfer To", async function () {
         const [deployer, account2, account3, pool, relayNode, user, user2] = await ethers.getSigners();
-        const {AddressZero} = ethers.constants
 
         const chainIdHardHat = await ethernalBridge.chainId();
         const chainIdBSC = 56;
         const amount = expandDecimals(100, 18); // 100 USDT
+        const faucetAmount = expandDecimals(1, 18);
         const uid = 1
 
         // Bridge USDT -> EUSDT
@@ -161,6 +164,7 @@ describe("Ethernal Bridge", function () {
 
         // set account2 to xOracleMessage
         await ethernalBridge.connect(deployer).setXOracleMessage(account2.address);
+
         await ethernalBridge.connect(deployer).addAllowToken(eusdt.address, vaultEthernalEUSDT.address);
         await vaultEthernalEUSDT.connect(deployer).setController(ethernalBridge.address);
         await usdt.connect(deployer).setController(vaultEthernalEUSDT.address, true);
@@ -170,8 +174,6 @@ describe("Ethernal Bridge", function () {
             to: faucetFund.address,
             value: expandDecimals(1, 18)
         })
-
-        const faucetAmount = expandDecimals(1, 18);
 
         // set faucetFund
         await ethernalBridge.connect(deployer).setFaucetFund(faucetFund.address);
@@ -183,32 +185,37 @@ describe("Ethernal Bridge", function () {
         await faucetFund.connect(deployer).addPool(ethernalBridge.address)
 
         // get ETH balance FaucetFund before xOracleCall
-        let balanceFaucetFundBefore = await faucetFund.balance()
+        const balanceFaucetFundBefore = await faucetFund.balance()
+
         // receiver = contract (usdt)
         await ethernalBridge.connect(account2).xOracleCall(encodePayload(uid, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdHardHat, account2.address, usdt.address))
 
         // get ETH balance FaucetFund after xOracleCall
-        let balanceFaucetFundAfter = await faucetFund.balance()
+        const balanceFaucetFundAfter = await faucetFund.balance()
         
-        expect(balanceFaucetFundAfter).to.be.equal(balanceFaucetFundBefore)
+        await expect(balanceFaucetFundAfter).to.be.equal(balanceFaucetFundBefore)
 
         // get ETH balance user before xOracleCall
-        const balanceUserBefore = await user.getBalance()
+        let balanceUserBefore = await user.getBalance()
 
         await ethernalBridge.connect(account2).xOracleCall(encodePayload(uid + 1, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdHardHat, account2.address, user.address))
 
         // get ETH balance user after xOracleCall
-        const balanceUserAfter = await user.getBalance()
+        let balanceUserAfter = await user.getBalance()
 
-        const amountUser = balanceUserAfter.sub(balanceUserBefore);
-        expect(amountUser).to.be.equal(faucetAmount);
+        const amountUser = await balanceUserAfter.sub(balanceUserBefore);
+        await expect(amountUser).to.be.equal(faucetAmount);
 
-        balanceFaucetFundBefore = await faucetFund.balance()
+        // get ETH balance user before xOracleCall
+        balanceUserBefore = await user.getBalance()
+
         // faucet fund = 0, do not transfer to user
         await ethernalBridge.connect(account2).xOracleCall(encodePayload(uid + 2, tokenIndexes.USDT, tokenIndexes.EUSDT, amount, chainIdBSC, chainIdHardHat, account2.address, user.address))
-        balanceFaucetFundAfter = await faucetFund.balance()
+        
+        // get ETH balance user after xOracleCall
+        balanceUserAfter = await user.getBalance()
 
-        expect(balanceFaucetFundAfter).to.be.equal(balanceFaucetFundBefore)
+        await expect(balanceUserBefore).to.be.equal(balanceUserAfter)
     });
 })
 
