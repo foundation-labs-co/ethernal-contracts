@@ -59,3 +59,5 @@ Thumbs.db
 # mock contracts
 contracts/mock/VToken.sol
 contracts/mock/VBNB.sol
+
+test/vaultVenus.js

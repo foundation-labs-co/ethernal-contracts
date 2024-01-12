@@ -11,7 +11,6 @@ async function main() {
   const tokens = [
     getContractAddress(`btc`),
     getContractAddress(`eth`),
-    getContractAddress(`bnb`),
     getContractAddress(`usdt`),
     getContractAddress(`usdc`),
   ]

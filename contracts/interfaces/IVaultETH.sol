@@ -3,7 +3,7 @@
 pragma solidity 0.8.19;
 
 interface IVaultETH {
-    function deposit(address from) external payable;
+    function deposit(address from) external payable returns(uint256);
     function withdraw(address to, uint256 amount) external;
     function totalBalance() external view returns(uint256);
     function reserveToken() external view returns(address);

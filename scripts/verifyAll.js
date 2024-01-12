@@ -41,68 +41,61 @@ function makeParameter(name) {
     param = ['Ethernal Passive Yield USDC', 'EUSDC', getContractAddress('usdc')]
   } else if (name == 'EthernalBridge') {
     param = [config.chains[chainId].xOracleMessage]
-  } else if (name == 'VaultMintable BTC') {
+  } else if (name == 'VaultBTC') {
     vaultToken = getVaultTokenByName('BTC')
     param = [vaultToken.tokenIndex, getContractAddress(vaultToken.tokenName), vaultToken.minDeposit]
-  } else if (name == 'VaultMintable ETH') {
+  } else if (name == 'VaultETH') {
     vaultToken = getVaultTokenByName('ETH')
     param = [vaultToken.tokenIndex, getContractAddress(vaultToken.tokenName), vaultToken.minDeposit]
-  } else if (name == 'VaultMintable BNB') {
+  } else if (name == 'VaultBNB') {
     vaultToken = getVaultTokenByName('BNB')
     param = [vaultToken.tokenIndex, getContractAddress(vaultToken.tokenName), vaultToken.minDeposit]
-  } else if (name == 'VaultMintable USDT') {
+  } else if (name == 'VaultUSDT') {
     vaultToken = getVaultTokenByName('USDT')
     param = [vaultToken.tokenIndex, getContractAddress(vaultToken.tokenName), vaultToken.minDeposit]
-  } else if (name == 'VaultMintable USDC') {
+  } else if (name == 'VaultUSDC') {
     vaultToken = getVaultTokenByName('USDC')
     param = [vaultToken.tokenIndex, getContractAddress(vaultToken.tokenName), vaultToken.minDeposit]
-  } else if (name == 'VaultEthernal EBTC') {
+  } else if (name == 'VaultEBTC') {
     vaultToken = getVaultTokenByName('EBTC')
     param = [
       vaultToken.tokenIndex,
       getContractAddress(vaultToken.tokenName),
       vaultToken.minDeposit,
-      vaultToken.reserveTokenIndex,
       getContractAddress(vaultToken.ethernalTokenName),
     ]
-  } else if (name == 'VaultEthernal EETH') {
+  } else if (name == 'VaultEETH') {
     vaultToken = getVaultTokenByName('EETH')
     param = [
       vaultToken.tokenIndex,
       getContractAddress(vaultToken.tokenName),
       vaultToken.minDeposit,
-      vaultToken.reserveTokenIndex,
       getContractAddress(vaultToken.ethernalTokenName),
     ]
-  } else if (name == 'VaultEthernal EBNB') {
+  } else if (name == 'VaultEBNB') {
     vaultToken = getVaultTokenByName('EBNB')
     param = [
       vaultToken.tokenIndex,
       getContractAddress(vaultToken.tokenName),
       vaultToken.minDeposit,
-      vaultToken.reserveTokenIndex,
       getContractAddress(vaultToken.ethernalTokenName),
     ]
-  } else if (name == 'VaultEthernal EUSDT') {
+  } else if (name == 'VaultEUSDT') {
     vaultToken = getVaultTokenByName('EUSDT')
     param = [
       vaultToken.tokenIndex,
       getContractAddress(vaultToken.tokenName),
       vaultToken.minDeposit,
-      vaultToken.reserveTokenIndex,
       getContractAddress(vaultToken.ethernalTokenName),
     ]
-  } else if (name == 'VaultEthernal EUSDC') {
+  } else if (name == 'VaultEUSDC') {
     vaultToken = getVaultTokenByName('EUSDC')
     param = [
       vaultToken.tokenIndex,
       getContractAddress(vaultToken.tokenName),
       vaultToken.minDeposit,
-      vaultToken.reserveTokenIndex,
       getContractAddress(vaultToken.ethernalTokenName),
     ]
-  } else if (name == 'EthernalReader') {
-    param = []
   }
 
   if (param.length != 0) {

@@ -3,12 +3,12 @@
 pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "hardhat/console.sol";
 
 interface IEthernalBridge {
     function getTokenPause(address token) external view returns(bool);
     function getTokenVault(address token) external view returns(address);
     function getTokenIndexVault(uint256 tokenIndex) external view returns(address);
+    function getFaucet() external view returns(uint256);
 }
 
 interface IVault {
@@ -60,7 +60,7 @@ contract EthernalReader {
             // check if reserveToken != token, it's ethernal token
             bool isEthernalToken = IVault(vault).reserveToken() != token;
             uint256 apr = 0;
-            uint256 exchangeRate = 1;
+            uint256 exchangeRate = 1e18;
             uint256 reserveBalance = balance;
             
             if (isEthernalToken) {
@@ -94,16 +94,18 @@ contract EthernalReader {
         bool isPause,
         bool isEthernalToken,
         uint256 apr,
-        uint256 exchangeRate
+        uint256 exchangeRate,
+        uint256 faucet
     ) {
         // get vault
         address vault = IEthernalBridge(_ethernalBridge).getTokenVault(_token);
         minAmount = IVault(vault).minDeposit();
         isPause = IVault(vault).depositPause();
+        faucet = IEthernalBridge(_ethernalBridge).getFaucet();
 
         // check if reserveToken != token, it's ethernal token
         isEthernalToken = IVault(vault).reserveToken() != _token;
-        exchangeRate = 1;
+        exchangeRate = 1e18;
 
         if (isEthernalToken) {
             address ethernalToken = IVaultEthernal(vault).ethernalToken();

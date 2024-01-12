@@ -29,6 +29,7 @@ const contactAddress = {
   vaultEUSDC: deployedAddress['VaultEUSDC'],
   ethernalBridge: deployedAddress['EthernalBridge'],
   ethernalReader: deployedAddress['EthernalReader'],
+  faucetFund: deployedAddress['FaucetFund'],
 }
 
 function getContractAddress(name) {
@@ -117,7 +118,7 @@ function readTmpAddresses() {
 
 function writeTmpAddresses(json) {
   const tmpAddresses = Object.assign(readTmpAddresses(), json)
-  fs.writeFileSync(filePath, JSON.stringify(tmpAddresses, null, 2))
+  fs.writeFileSync(filePath, JSON.stringify(tmpAddresses, null, 4))
 }
 
 async function sendTxn(txnPromise, label) {

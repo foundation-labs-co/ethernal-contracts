@@ -16,15 +16,15 @@ contract ERC20Token is ERC20, Ownable {
         _;
     }
     
-    function mint(address _account, uint256 _amount) external onlyController() {
+    function mint(address _account, uint256 _amount) external onlyController {
         _mint(_account, _amount);
     }
 
-    function burn(address _account, uint256 _amount) external onlyController() {
+    function burn(address _account, uint256 _amount) external onlyController {
         _burn(_account, _amount);
     }
 
-    function setController(address _controller, bool _flag) external onlyOwner() {
+    function setController(address _controller, bool _flag) external onlyOwner {
         require(_controller != address(0), "invalid address");
         controllers[_controller] = _flag;
     }

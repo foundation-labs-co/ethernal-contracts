@@ -48,11 +48,10 @@ contract VaultETH is IVaultETH {
 
     /**
      * @dev Call from EthernalBridge.send()
-     * @param _from sender address
      * - msg.value is amount of ReserveToken
      */
-    function deposit(address _from) external payable override onlyController(){
-
+    function deposit(address /*_from*/) external payable override onlyController returns(uint256) {
+        return msg.value;
     }
 
     /**
@@ -60,7 +59,7 @@ contract VaultETH is IVaultETH {
      * @param _to receiver address
      * @param _amount amount of ReserveToken
      */
-    function withdraw(address _to, uint256 _amount) external override onlyController(){
+    function withdraw(address _to, uint256 _amount) external override onlyController {
 
     }
 

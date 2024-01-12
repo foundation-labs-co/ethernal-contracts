@@ -54,14 +54,14 @@ describe("Vaults", function () {
         vaultMintableUSDT = await VaultMintable.deploy(tokenIndexes.USDT, usdt.address, expandDecimals(1, 18));
         await vaultMintableUSDT.deployed();
 
-        vaultEthernalEUSDT = await VaultEthernal.deploy(tokenIndexes.EUSDT, usdt.address, expandDecimals(1, 18), tokenIndexes.USDT, eusdt.address);
+        vaultEthernalEUSDT = await VaultEthernal.deploy(tokenIndexes.EUSDT, usdt.address, expandDecimals(1, 18), eusdt.address);
         await vaultEthernalEUSDT.deployed();
 
         // Deploy Vault ETH - EETH
         vaultMintableETH = await VaultMintable.deploy(tokenIndexes.ETH, eth.address, expandDecimals(1000, 18));
         await vaultMintableETH.deployed();
 
-        vaultEthernalEETH = await VaultEthernal.deploy(tokenIndexes.EETH, eth.address, expandDecimals(1000, 18), tokenIndexes.ETH, eeth.address);
+        vaultEthernalEETH = await VaultEthernal.deploy(tokenIndexes.EETH, eth.address, expandDecimals(1000, 18), eeth.address);
         await vaultEthernalEETH.deployed();
 
         // Deploy Vault Venus
