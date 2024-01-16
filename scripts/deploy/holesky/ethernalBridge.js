@@ -1,11 +1,10 @@
 const { deployContract, contractAt, getContractAddress, sendTxn, getFrameSigner } = require('../../lib/deploy')
 const { networkId, config } = require('../../../config')
-const { toWei } = require('../../lib/helper')
 
 async function main() {
   let deployer = await getFrameSigner()
 
-  const srcChain = networkId.bscTestnet
+  const srcChain = networkId.holesky
   const isFaucetAvailable = +config.chains[srcChain].faucet > 0
 
   // deploy EthernalBridge
@@ -15,19 +14,42 @@ async function main() {
     'EthernalBridge',
     deployer
   )
-  // const ethernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
 
   // deploy Vaults
   for (let i = 0; i < config.chains[srcChain].vaultTokens.length; i++) {
     const vaultToken = config.chains[srcChain].vaultTokens[i]
-    const tokenAddress = getContractAddress(vaultToken.tokenName)
-    const vault = await deployContract(
-      vaultToken.type,
-      [vaultToken.tokenIndex, getContractAddress(vaultToken.tokenName), vaultToken.minDeposit, vaultToken.ibToken],
-      `Vault${vaultToken.name}`,
-      deployer
-    )
-    // const vault = await contractAt(vaultToken.type, getContractAddress(`vault${vaultToken.name}`), deployer)
+    let vault
+    let tokenAddress
+    if (vaultToken.type == 'VaultMintable') {
+      vault = await deployContract(
+        'VaultMintable',
+        [vaultToken.tokenIndex, getContractAddress(vaultToken.tokenName), vaultToken.minDeposit],
+        `Vault${vaultToken.name}`,
+        deployer
+      )
+      tokenAddress = getContractAddress(vaultToken.tokenName)
+    } else if (vaultToken.type == 'VaultEthernal') {
+      vault = await deployContract(
+        'VaultEthernal',
+        [
+          vaultToken.tokenIndex,
+          getContractAddress(vaultToken.tokenName),
+          vaultToken.minDeposit,
+          getContractAddress(vaultToken.ethernalTokenName),
+        ],
+        `Vault${vaultToken.name}`,
+        deployer
+      )
+      tokenAddress = getContractAddress(vaultToken.ethernalTokenName)
+    } else if (vaultToken.type == 'VaultCompoundETH') {
+        vault = await deployContract(
+        'VaultCompoundETH',
+        [vaultToken.tokenIndex, getContractAddress(vaultToken.tokenName), vaultToken.minDeposit, vaultToken.ibToken],
+        `Vault${vaultToken.name}`,
+        deployer
+      )
+      tokenAddress = getContractAddress(vaultToken.tokenName)
+    }
 
     // set controller
     await sendTxn(vault.setController(ethernalBridge.address), `vault.setController(${ethernalBridge.address})`)
@@ -37,7 +59,7 @@ async function main() {
       // removeAllowToken
       await sendTxn(ethernalBridge.removeAllowToken(tokenAddress), `ethernalBridge.removeAllowToken(${tokenAddress})`)
     }
-
+    
     // addAllowTokens
     await sendTxn(
       ethernalBridge.addAllowToken(tokenAddress, vault.address),

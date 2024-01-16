@@ -57,6 +57,12 @@ module.exports = {
       gasPrice: 1 * 10 ** 9,
       accounts: [`0x${process.env.PRIVATE_KEY}`],
     },
+    holesky: {
+      url: `https://ethereum-holesky.publicnode.com`,
+      chainId: 17000,
+      gasPrice: 1 * 10 ** 9,
+      accounts: [`0x${process.env.PRIVATE_KEY}`],
+    },
   },
   etherscan: {
     apiKey: {

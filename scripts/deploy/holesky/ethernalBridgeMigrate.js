@@ -1,14 +1,16 @@
 const { deployContract, contractAt, getContractAddress, sendTxn, getFrameSigner } = require('../../lib/deploy')
 const { networkId, config } = require('../../../config')
-const { toWei } = require('../../lib/helper')
 
 async function main() {
   let deployer = await getFrameSigner()
 
-  const srcChain = networkId.bscTestnet
+  const srcChain = networkId.holesky
   const isFaucetAvailable = +config.chains[srcChain].faucet > 0
 
-  // deploy EthernalBridge
+  // prev EthernalBridge
+  const prevEthernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
+
+  // deploy new EthernalBridge
   const ethernalBridge = await deployContract(
     'EthernalBridge',
     [config.chains[srcChain].xOracleMessage],
@@ -17,26 +19,19 @@ async function main() {
   )
   // const ethernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
 
-  // deploy Vaults
+  // migrate
   for (let i = 0; i < config.chains[srcChain].vaultTokens.length; i++) {
     const vaultToken = config.chains[srcChain].vaultTokens[i]
-    const tokenAddress = getContractAddress(vaultToken.tokenName)
-    const vault = await deployContract(
-      vaultToken.type,
-      [vaultToken.tokenIndex, getContractAddress(vaultToken.tokenName), vaultToken.minDeposit, vaultToken.ibToken],
-      `Vault${vaultToken.name}`,
-      deployer
-    )
-    // const vault = await contractAt(vaultToken.type, getContractAddress(`vault${vaultToken.name}`), deployer)
+    const vault = await contractAt(vaultToken.type, getContractAddress(`vault${vaultToken.name}`), deployer)
+    let tokenAddress
+    if (vaultToken.type == 'VaultMintable') {
+      tokenAddress = getContractAddress(vaultToken.tokenName)
+    } else if (vaultToken.type == 'VaultEthernal') {
+      tokenAddress = getContractAddress(vaultToken.ethernalTokenName)
+    }
 
     // set controller
     await sendTxn(vault.setController(ethernalBridge.address), `vault.setController(${ethernalBridge.address})`)
-
-    const isExist = await ethernalBridge.tokenVaults(tokenAddress)
-    if (isExist != '0x0000000000000000000000000000000000000000') {
-      // removeAllowToken
-      await sendTxn(ethernalBridge.removeAllowToken(tokenAddress), `ethernalBridge.removeAllowToken(${tokenAddress})`)
-    }
 
     // addAllowTokens
     await sendTxn(
@@ -52,13 +47,16 @@ async function main() {
       ethernalBridge.addPairTokenIndex(pairTokenIndex[0], pairTokenIndex[1]),
       `ethernalBridge.addPairTokenIndex(${pairTokenIndex[0]}, ${pairTokenIndex[1]})`
     )
-  }
+  } 
 
   // set faucetFund
   if (isFaucetAvailable) {
     const faucetFund = await contractAt('FaucetFund', getContractAddress(`faucetFund`), deployer)
     await sendTxn(ethernalBridge.setFaucetFund(faucetFund.address), `ethernalBridge.setFaucetFund(${faucetFund.address})`)
     await sendTxn(faucetFund.addPool(ethernalBridge.address), `faucetFund.addPool(${ethernalBridge.address})`)
+
+    // remove prevEthernalBridge
+    await sendTxn(faucetFund.removePool(prevEthernalBridge.address), `faucetFund.removePool(${prevEthernalBridge.address})`)
   }
 }
 
