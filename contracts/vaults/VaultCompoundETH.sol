@@ -88,10 +88,6 @@ contract VaultCompoundETH is IVaultETH, Ownable, Pausable {
         return super.paused();
     }
 
-    function reserveBalance() external override view returns(uint256) {
-        return address(this).balance;
-    }
-
     // ------------------------------
     // onlyOwner
     // ------------------------------
