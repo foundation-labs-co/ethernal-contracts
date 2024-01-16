@@ -4,8 +4,8 @@ async function main() {
   let deployer = await getFrameSigner()
 
   // deploy EthernalReader
-  // const ethernalReader = await deployContract('EthernalReader', [], 'EthernalReader', deployer)
-  const ethernalReader = await contractAt('EthernalReader', getContractAddress(`ethernalReader`), deployer)
+  const ethernalReader = await deployContract('EthernalReader', [], 'EthernalReader', deployer)
+  // const ethernalReader = await contractAt('EthernalReader', getContractAddress(`ethernalReader`), deployer)
 
   // test reader
   const tokens = [
