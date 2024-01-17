@@ -55,7 +55,12 @@ contract EthernalReader {
             // get token info
             address vault = IEthernalBridge(_ethernalBridge).getTokenVault(token);
             uint256 tokenIndex = IVault(vault).tokenIndex();
-            uint256 balance = IERC20(token).balanceOf(_account);
+            uint256 balance = 0;
+            if (token == ETH_TOKEN) {
+                balance = _account.balance;
+            } else {
+                balance = IERC20(token).balanceOf(_account);
+            }
             bool pause = IEthernalBridge(_ethernalBridge).getTokenPause(token);
 
             // check if reserveToken != token, it's ethernal token

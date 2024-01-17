@@ -16,6 +16,10 @@ async function main() {
     })
     const usdt = await deployContract('ERC20Token', ['USDT (Ethernal)', 'USDT'], 'USDT', deployer)
     const usdc = await deployContract('ERC20Token', ['USDC (Ethernal)', 'USDC'], 'USDC', deployer)
+    // const btc = await getContractAddress(`btc`)
+    // const eth = await getContractAddress(`eth`)
+    // const usdt = await getContractAddress(`usdt`)
+    // const usdc = await getContractAddress(`usdc`)
 
     // ibToken
     const vbtc = await deployContract('VToken', ['Venus BTC', 'VBTC', getContractAddress('btc'), interestPerBlock], 'VBTC', deployer)

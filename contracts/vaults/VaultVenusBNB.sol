@@ -81,7 +81,7 @@ contract VaultVenusBNB is IVaultETH, Ownable, Pausable {
 
     function totalBalance() external override view returns(uint256) {
         uint256 balance = IERC20(ibToken).balanceOf(address(this));
-        return (balance * 1e38) / IVBNB(ibToken).exchangeRateStored();
+        return (balance * IVBNB(ibToken).exchangeRateStored()) / 1e18;
     }
 
     function depositPause() external override view returns(bool) {

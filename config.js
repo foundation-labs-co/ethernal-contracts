@@ -40,7 +40,7 @@ const config = {
 
 config.chains[networkId.bscTestnet] = {
   xOracleMessage: '0xf533C443902dDb3a385c81aC2dC199B1c612FD0c',
-  ethernalBridge: '0xA2930608Bf7ca3C68e7513481DF4e4B250B4b19c',
+  ethernalBridge: '0xaeC71AaaA55977a0fff77ecc215E30c08bEA98A3',
   faucet: '0',
   vaultTokens: [
     {
@@ -49,7 +49,7 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.BTC,
       tokenName: 'btc',
       minDeposit: toWei(`0.00005`),
-      ibToken: '0xfBE6A47711Dbc631693471cDE3e9ee7665ED6381',
+      ibToken: '0xB5affba8698d158c2D90f041C03Ca46F25440e7F',
     },
     {
       type: 'VaultVenus',
@@ -57,7 +57,7 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.ETH,
       tokenName: 'eth',
       minDeposit: toWei(`0.001`),
-      ibToken: '0x601e29eD938f382c345A22f3F28196d633649E9c',
+      ibToken: '0x33BF8CCdbCa8F482388a6586aBEE7daC814e521B',
     },
     {
       type: 'VaultVenusBNB',
@@ -65,7 +65,7 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.BNB,
       tokenName: 'bnb',
       minDeposit: toWei(`0.008`),
-      ibToken: '0x8F55d2beFC176e69893b9B75AA360524AF514CD9',
+      ibToken: '0xa90Ce10B7A523E735649B6265d0919AbD54d623c',
     },
     {
       type: 'VaultVenus',
@@ -73,7 +73,7 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.USDT,
       tokenName: 'usdt',
       minDeposit: toWei(`1`),
-      ibToken: '0xd5310625A687c802f6247f605F8334C33BE499ea',
+      ibToken: '0x53B6605CAa2360a9b571fc9B12fEe2D5A4bB2ca3',
     },
     {
       type: 'VaultVenus',
@@ -81,7 +81,7 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.USDC,
       tokenName: 'usdc',
       minDeposit: toWei(`1`),
-      ibToken: '0x280DCe8413fE8986BD38C3f08f1883526E38B857',
+      ibToken: '0x81155d245dA642e08fed426Bd7F8c44Ba18A8ed2',
     },
   ],
 }
@@ -176,7 +176,7 @@ config.chains[networkId.develop] = {
 
 config.chains[networkId.holesky] = {
   xOracleMessage: '0x1b404D1491e488001A8545b86E58ac8362D0E95C',
-  ethernalBridge: '0xEC3c5910F1101A5E5c2Ee959e162917195eCad79',
+  ethernalBridge: '0xda7d95f43240BdF06A01957cF0C1b28300976AFF',
   faucet: '0.25',
   vaultTokens: [
     {
@@ -192,7 +192,7 @@ config.chains[networkId.holesky] = {
       tokenIndex: tokenIndexes.ETH,
       tokenName: 'eth',
       minDeposit: toWei(`0.001`),
-      ibToken: '0xe2D18B00B5fC3E2b7b581542d74212F16Ba9A9F5',
+      ibToken: '0x2223E4aC2044bdec1de6CcC54f7c59ad4ADcdC8E',
     },
     {
       type: 'VaultMintable',

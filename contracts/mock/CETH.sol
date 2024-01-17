@@ -109,6 +109,10 @@ contract CETH is ERC20, Ownable {
         return (_amount * ethernalRatio()) / 1e18;
     }
 
+    function exchangeRateStored() external view returns (uint) {
+        return ethernalRatio();
+    }
+
     // ------------------------------
     // onlyOwner
     // ------------------------------

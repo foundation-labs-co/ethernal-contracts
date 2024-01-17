@@ -19,11 +19,11 @@ async function main() {
     const ceth = await deployContract('CETH', ['Compound ETH', 'CETH', 0], 'CETH', deployer)
     
     // EthernalToken
-    const ebtc = await deployContract('EthernalToken', ['Ethernal Passive Yield BTC', 'EBTC', btc.address], 'EBTC', deployer)
+    const ebtc = await deployContract('EthernalToken', ['Ethernal Passive Yield BTC', 'EBTC', getContractAddress(`btc`)], 'EBTC', deployer)
     // const eeth = await deployContract('EthernalToken', ['Ethernal Passive Yield ETH', 'EETH', eth.address], 'EETH', deployer)
-    const ebnb = await deployContract('EthernalToken', ['Ethernal Passive Yield BNB', 'EBNB', bnb.address], 'EBNB', deployer)
-    const eusdt = await deployContract('EthernalToken', ['Ethernal Passive Yield USDT', 'EUSDT', usdt.address], 'EUSDT', deployer)
-    const eusdc = await deployContract('EthernalToken', ['Ethernal Passive Yield USDC', 'EUSDC', usdc.address], 'EUSDC', deployer)
+    const ebnb = await deployContract('EthernalToken', ['Ethernal Passive Yield BNB', 'EBNB', getContractAddress(`eth`)], 'EBNB', deployer)
+    const eusdt = await deployContract('EthernalToken', ['Ethernal Passive Yield USDT', 'EUSDT', getContractAddress(`usdt`)], 'EUSDT', deployer)
+    const eusdc = await deployContract('EthernalToken', ['Ethernal Passive Yield USDC', 'EUSDC', getContractAddress(`usdc`)], 'EUSDC', deployer)
 }
 
 main()

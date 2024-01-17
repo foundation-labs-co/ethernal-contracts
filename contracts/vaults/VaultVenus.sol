@@ -82,7 +82,7 @@ contract VaultVenus is IVault, Ownable, Pausable {
 
     function totalBalance() external override view returns(uint256) {
         uint256 balance = IERC20(ibToken).balanceOf(address(this));
-        return (balance * 1e38) / IVToken(ibToken).exchangeRateStored();
+        return (balance * IVToken(ibToken).exchangeRateStored()) / 1e18;
     }
 
     function depositPause() external override view returns(bool) {
