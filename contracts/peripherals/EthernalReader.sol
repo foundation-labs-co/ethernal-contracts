@@ -17,6 +17,7 @@ interface IVault {
     function minDeposit() external view returns(uint256);
     function depositPause() external view returns(bool);
     function totalBalance() external view returns(uint256);
+    function isVaultMintable() external view returns(bool);
 }
 
 interface IVaultEthernal {
@@ -102,7 +103,8 @@ contract EthernalReader {
         bool isEthernalToken,
         uint256 apr,
         uint256 exchangeRate,
-        uint256 faucet
+        uint256 faucet,
+        bool isMintable
     ) {
         // get vault
         address vault = IEthernalBridge(_ethernalBridge).getTokenVault(_token);
@@ -110,6 +112,7 @@ contract EthernalReader {
         isPause = IVault(vault).depositPause();
         totalBalance = IVault(vault).totalBalance();
         faucet = IEthernalBridge(_ethernalBridge).getFaucet();
+        isMintable = IVault(vault).isVaultMintable();
 
         // check if reserveToken != token, it's ethernal token
         isEthernalToken = IVault(vault).reserveToken() != _token;

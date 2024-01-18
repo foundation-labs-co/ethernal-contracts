@@ -11,4 +11,5 @@ interface IVaultETH {
     function tokenIndex() external view returns(uint256);
     function minDeposit() external view returns(uint256);
     function depositPause() external view returns(bool);
+    function isVaultMintable() external view returns(bool);
 }

@@ -40,7 +40,7 @@ const config = {
 
 config.chains[networkId.bscTestnet] = {
   xOracleMessage: '0xf533C443902dDb3a385c81aC2dC199B1c612FD0c',
-  ethernalBridge: '0xaeC71AaaA55977a0fff77ecc215E30c08bEA98A3',
+  ethernalBridge: '0x9e477E4f97e5f548ed847a33C531b02E17eB3FCF',
   faucet: '0',
   vaultTokens: [
     {

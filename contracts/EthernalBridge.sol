@@ -82,11 +82,12 @@ contract EthernalBridge is Ownable, ReentrancyGuard {
     event SetSupportDstTokenIndex(uint64 indexed dstChainId, uint256 indexed tokenIndex, bool support);
     event SetFaucetFund(address indexed faucetFund);
 
-    constructor(address _xOracleMessage) {
+    constructor(address _xOracleMessage, uint256 _lastUid) {
         require(_xOracleMessage != address(0), "invalid address");
 
         chainId = uint64(block.chainid);
         xOracleMessage = _xOracleMessage;
+        uid = _lastUid;
     }
 
     /**

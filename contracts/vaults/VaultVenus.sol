@@ -89,6 +89,10 @@ contract VaultVenus is IVault, Ownable, Pausable {
         return super.paused();
     }
 
+    function isVaultMintable() external override pure returns(bool) {
+        return false;
+    }
+
     // ------------------------------
     // onlyOwner
     // ------------------------------

@@ -9,11 +9,12 @@ async function main() {
 
   // prev EthernalBridge
   const prevEthernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
+  const lastUid = await prevEthernalBridge.uid()
 
   // deploy new EthernalBridge
   const ethernalBridge = await deployContract(
     'EthernalBridge',
-    [config.chains[srcChain].xOracleMessage],
+    [config.chains[srcChain].xOracleMessage, lastUid],
     'EthernalBridge',
     deployer
   )

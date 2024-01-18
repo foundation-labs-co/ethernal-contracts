@@ -9,11 +9,12 @@ async function main() {
 
   // prev EthernalBridge
   const prevEthernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
+  const lastUid = await prevEthernalBridge.uid()
 
   // deploy new EthernalBridge
   const ethernalBridge = await deployContract(
     'EthernalBridge',
-    [config.chains[srcChain].xOracleMessage],
+    [config.chains[srcChain].xOracleMessage, lastUid],
     'EthernalBridge',
     deployer
   )
@@ -47,11 +48,17 @@ async function main() {
   // set faucetFund
   if (isFaucetAvailable) {
     const faucetFund = await contractAt('FaucetFund', getContractAddress(`faucetFund`), deployer)
-    await sendTxn(ethernalBridge.setFaucetFund(faucetFund.address), `ethernalBridge.setFaucetFund(${faucetFund.address})`)
+    await sendTxn(
+      ethernalBridge.setFaucetFund(faucetFund.address),
+      `ethernalBridge.setFaucetFund(${faucetFund.address})`
+    )
     await sendTxn(faucetFund.addPool(ethernalBridge.address), `faucetFund.addPool(${ethernalBridge.address})`)
 
     // remove prevEthernalBridge
-    await sendTxn(faucetFund.removePool(prevEthernalBridge.address), `faucetFund.removePool(${prevEthernalBridge.address})`)
+    await sendTxn(
+      faucetFund.removePool(prevEthernalBridge.address),
+      `faucetFund.removePool(${prevEthernalBridge.address})`
+    )
   }
 }
 
