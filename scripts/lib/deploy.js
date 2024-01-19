@@ -30,6 +30,12 @@ const contactAddress = {
   ethernalBridge: deployedAddress['EthernalBridge'],
   ethernalReader: deployedAddress['EthernalReader'],
   faucetFund: deployedAddress['FaucetFund'],
+  vbtc: deployedAddress['VBTC'],
+  veth: deployedAddress['VETH'],
+  vbnb: deployedAddress['VBNB'],
+  vusdt: deployedAddress['VUSDT'],
+  vusdc: deployedAddress['VUSDC'],
+  ceth: deployedAddress['CETH'],
 }
 
 function getContractAddress(name) {
