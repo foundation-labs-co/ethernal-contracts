@@ -14,6 +14,11 @@ async function main() {
     const bnb = await deployContract('ERC20Token', ['BNB  (Ethernal)', 'BNB'], 'BNB', deployer)
     const usdt = await deployContract('ERC20Token', ['USDT (Ethernal)', 'USDT'], 'USDT', deployer)
     const usdc = await deployContract('ERC20Token', ['USDC (Ethernal)', 'USDC'], 'USDC', deployer)
+    // const btc = await getContractAddress(`btc`)
+    // const eth = await getContractAddress(`eth`)
+    // const bnb = await getContractAddress(`bnb`)
+    // const usdt = await getContractAddress(`usdt`)
+    // const usdc = await getContractAddress(`usdc`)
 
     // ibToken
     const ceth = await deployContract('CETH', ['Compound ETH', 'CETH', 0], 'CETH', deployer)

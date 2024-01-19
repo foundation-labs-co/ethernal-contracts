@@ -6,11 +6,12 @@ async function main() {
 
   const srcChain = networkId.develop
   const isFaucetAvailable = +config.chains[srcChain].faucet > 0
+  const initialUid = 0
 
   // deploy EthernalBridge
   const ethernalBridge = await deployContract(
     'EthernalBridge',
-    [config.chains[srcChain].xOracleMessage],
+    [config.chains[srcChain].xOracleMessage, initialUid],
     'EthernalBridge',
     deployer
   )
