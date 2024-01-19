@@ -100,19 +100,19 @@ contract EthernalReader {
         uint256 minAmount,
         bool isPause,
         uint256 totalBalance,
+        bool isVaultMintable,
         bool isEthernalToken,
         uint256 apr,
         uint256 exchangeRate,
-        uint256 faucet,
-        bool isMintable
+        uint256 faucet
     ) {
         // get vault
         address vault = IEthernalBridge(_ethernalBridge).getTokenVault(_token);
         minAmount = IVault(vault).minDeposit();
         isPause = IVault(vault).depositPause();
         totalBalance = IVault(vault).totalBalance();
+        isVaultMintable = IVault(vault).isVaultMintable();
         faucet = IEthernalBridge(_ethernalBridge).getFaucet();
-        isMintable = IVault(vault).isVaultMintable();
 
         // check if reserveToken != token, it's ethernal token
         isEthernalToken = IVault(vault).reserveToken() != _token;
