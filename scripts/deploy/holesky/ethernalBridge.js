@@ -4,10 +4,10 @@ const { networkId, config } = require('../../../config')
 async function main() {
   let deployer = await getFrameSigner()
 
-  const srcChain = networkId.develop
+  const srcChain = networkId.holesky
   const isFaucetAvailable = +config.chains[srcChain].faucet > 0
   const initialUid = 0
-
+  
   // deploy EthernalBridge
   const ethernalBridge = await deployContract(
     'EthernalBridge',
@@ -42,6 +42,14 @@ async function main() {
         deployer
       )
       tokenAddress = getContractAddress(vaultToken.ethernalTokenName)
+    } else if (vaultToken.type == 'VaultCompoundETH') {
+        vault = await deployContract(
+        'VaultCompoundETH',
+        [vaultToken.tokenIndex, getContractAddress(vaultToken.tokenName), vaultToken.minDeposit, vaultToken.ibToken],
+        `Vault${vaultToken.name}`,
+        deployer
+      )
+      tokenAddress = getContractAddress(vaultToken.tokenName)
     }
 
     // set controller

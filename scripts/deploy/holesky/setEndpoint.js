@@ -4,7 +4,7 @@ const { networkId, config } = require('../../../config')
 async function main() {
   let deployer = await getFrameSigner()
 
-  const dstChains = [networkId.develop, networkId.holesky]
+  const dstChains = [networkId.bscTestnet,networkId.develop]
 
   // ethernalBridge
   const ethernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
@@ -18,7 +18,7 @@ async function main() {
       `ethernalBridge.setEndpoint(${dstChainId}, ${endpoint})`
     )
   }
-
+  
   // set supported tokenIndexes for dstChain
   for (let i = 0; i < dstChains.length; i++) {
     const dstChain = dstChains[i]

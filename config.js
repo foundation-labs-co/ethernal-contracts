@@ -3,6 +3,7 @@ const { toWei } = require('./scripts/lib/helper')
 const networkId = {
   bscTestnet: 97,
   develop: 1112,
+  holesky: 17000,
 }
 
 const tokenIndexes = {
@@ -39,7 +40,7 @@ const config = {
 
 config.chains[networkId.bscTestnet] = {
   xOracleMessage: '0xf533C443902dDb3a385c81aC2dC199B1c612FD0c',
-  ethernalBridge: '0xA2930608Bf7ca3C68e7513481DF4e4B250B4b19c',
+  ethernalBridge: '0x506f723c2D91c29C2438AcA3014a1eaA1d5915aa',
   faucet: '0',
   vaultTokens: [
     {
@@ -48,7 +49,8 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.BTC,
       tokenName: 'btc',
       minDeposit: toWei(`0.00005`),
-      ibToken: '0xfBE6A47711Dbc631693471cDE3e9ee7665ED6381',
+      ibToken: '0xc12D786be0b12d3886E5d343a35f6552c1cb4879',
+      ibTokenRate: '2000',
     },
     {
       type: 'VaultVenus',
@@ -56,7 +58,8 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.ETH,
       tokenName: 'eth',
       minDeposit: toWei(`0.001`),
-      ibToken: '0x601e29eD938f382c345A22f3F28196d633649E9c',
+      ibToken: '0x575c142C96e81B5B2ef16B464CB7aC9B3561ee6A',
+      ibTokenRate: '2000',
     },
     {
       type: 'VaultVenusBNB',
@@ -64,7 +67,8 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.BNB,
       tokenName: 'bnb',
       minDeposit: toWei(`0.008`),
-      ibToken: '0x8F55d2beFC176e69893b9B75AA360524AF514CD9',
+      ibToken: '0xf7706D78e1B1339cE5ad5DBb45319F0C740fE8bF',
+      ibTokenRate: '2000',
     },
     {
       type: 'VaultVenus',
@@ -72,7 +76,8 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.USDT,
       tokenName: 'usdt',
       minDeposit: toWei(`1`),
-      ibToken: '0xd5310625A687c802f6247f605F8334C33BE499ea',
+      ibToken: '0xD261B815b485A3B3bEDcecF6E8ae975Afe5C8fcC',
+      ibTokenRate: '2000',
     },
     {
       type: 'VaultVenus',
@@ -80,14 +85,15 @@ config.chains[networkId.bscTestnet] = {
       tokenIndex: tokenIndexes.USDC,
       tokenName: 'usdc',
       minDeposit: toWei(`1`),
-      ibToken: '0x280DCe8413fE8986BD38C3f08f1883526E38B857',
+      ibToken: '0x7F01771DB8AB022FC5F002478683cA52E8926820',
+      ibTokenRate: '2000',
     },
   ],
 }
 
 config.chains[networkId.develop] = {
   xOracleMessage: '0xccCd5c5D4e3d2F85d07f041759B96f8b8A622056',
-  ethernalBridge: '0x68c0F3D7fa2C233aCB398BA2A0A2B1D27E6e4F00',
+  ethernalBridge: '0x03f517DE846138D2Ff41a43DAEBE82F58b53b6ac',
   faucet: '0.25',
   vaultTokens: [
     {
@@ -133,6 +139,7 @@ config.chains[networkId.develop] = {
       minDeposit: toWei(`0.00005`),
       reserveTokenIndex: tokenIndexes.BTC,
       ethernalTokenName: 'ebtc',
+      ethernalTokenRate: '1000'
     },
     {
       type: 'VaultEthernal',
@@ -142,6 +149,7 @@ config.chains[networkId.develop] = {
       minDeposit: toWei(`0.001`),
       reserveTokenIndex: tokenIndexes.ETH,
       ethernalTokenName: 'eeth',
+      ethernalTokenRate: '1000'
     },
     {
       type: 'VaultEthernal',
@@ -151,6 +159,7 @@ config.chains[networkId.develop] = {
       minDeposit: toWei(`0.008`),
       reserveTokenIndex: tokenIndexes.BNB,
       ethernalTokenName: 'ebnb',
+      ethernalTokenRate: '1000'
     },
     {
       type: 'VaultEthernal',
@@ -160,6 +169,7 @@ config.chains[networkId.develop] = {
       minDeposit: toWei(`1`),
       reserveTokenIndex: tokenIndexes.USDT,
       ethernalTokenName: 'eusdt',
+      ethernalTokenRate: '1000'
     },
     {
       type: 'VaultEthernal',
@@ -169,6 +179,92 @@ config.chains[networkId.develop] = {
       minDeposit: toWei(`1`),
       reserveTokenIndex: tokenIndexes.USDC,
       ethernalTokenName: 'eusdc',
+      ethernalTokenRate: '1000'
+    },
+  ],
+}
+
+config.chains[networkId.holesky] = {
+  xOracleMessage: '0x1b404D1491e488001A8545b86E58ac8362D0E95C',
+  ethernalBridge: '0xD3a4E140227921f38B92595ED4BF36014cb74cE5',
+  faucet: '0.25',
+  vaultTokens: [
+    {
+      type: 'VaultMintable',
+      name: 'BTC',
+      tokenIndex: tokenIndexes.BTC,
+      tokenName: 'btc',
+      minDeposit: toWei(`0.00005`),
+    },
+    {
+      type: 'VaultCompoundETH',
+      name: 'ETH',
+      tokenIndex: tokenIndexes.ETH,
+      tokenName: 'eth',
+      minDeposit: toWei(`0.001`),
+      ibToken: '0xe9942b0E111d2ba08B5d04C842E5E76f2f54C020',
+      ibTokenRate: '2000',
+    },
+    {
+      type: 'VaultMintable',
+      name: 'BNB',
+      tokenIndex: tokenIndexes.BNB,
+      tokenName: 'bnb',
+      minDeposit: toWei(`0.008`),
+    },
+    {
+      type: 'VaultMintable',
+      name: 'USDT',
+      tokenIndex: tokenIndexes.USDT,
+      tokenName: 'usdt',
+      minDeposit: toWei(`1`),
+    },
+    {
+      type: 'VaultMintable',
+      name: 'USDC',
+      tokenIndex: tokenIndexes.USDC,
+      tokenName: 'usdc',
+      minDeposit: toWei(`1`),
+    },
+    {
+      type: 'VaultEthernal',
+      name: 'EBTC',
+      tokenIndex: tokenIndexes.EBTC,
+      tokenName: 'btc',
+      minDeposit: toWei(`0.00005`),
+      reserveTokenIndex: tokenIndexes.BTC,
+      ethernalTokenName: 'ebtc',
+      ethernalTokenRate: '1000'
+    },
+    {
+      type: 'VaultEthernal',
+      name: 'EBNB',
+      tokenIndex: tokenIndexes.EBNB,
+      tokenName: 'bnb',
+      minDeposit: toWei(`0.008`),
+      reserveTokenIndex: tokenIndexes.BNB,
+      ethernalTokenName: 'ebnb',
+      ethernalTokenRate: '1000'
+    },
+    {
+      type: 'VaultEthernal',
+      name: 'EUSDT',
+      tokenIndex: tokenIndexes.EUSDT,
+      tokenName: 'usdt',
+      minDeposit: toWei(`1`),
+      reserveTokenIndex: tokenIndexes.USDT,
+      ethernalTokenName: 'eusdt',
+      ethernalTokenRate: '1000'
+    },
+    {
+      type: 'VaultEthernal',
+      name: 'EUSDC',
+      tokenIndex: tokenIndexes.EUSDC,
+      tokenName: 'usdc',
+      minDeposit: toWei(`1`),
+      reserveTokenIndex: tokenIndexes.USDC,
+      ethernalTokenName: 'eusdc',
+      ethernalTokenRate: '1000'
     },
   ],
 }

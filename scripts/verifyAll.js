@@ -6,6 +6,7 @@ const { exec } = require('child_process')
 let isDone = false
 let errors = []
 const chainId = getChainId(network)
+const initialUid = 0
 
 function getVaultTokenByName(name) {
   for (let i = 0; i < config.chains[chainId].vaultTokens.length; i++) {
@@ -40,7 +41,7 @@ function makeParameter(name) {
   } else if (name == 'EUSDC') {
     param = ['Ethernal Passive Yield USDC', 'EUSDC', getContractAddress('usdc')]
   } else if (name == 'EthernalBridge') {
-    param = [config.chains[chainId].xOracleMessage]
+    param = [config.chains[chainId].xOracleMessage, initialUid]
   } else if (name == 'VaultBTC') {
     vaultToken = getVaultTokenByName('BTC')
     param = [vaultToken.tokenIndex, getContractAddress(vaultToken.tokenName), vaultToken.minDeposit]

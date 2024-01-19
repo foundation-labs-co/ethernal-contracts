@@ -5,16 +5,16 @@ async function main() {
   let deployer = await getFrameSigner()
 
   const srcChain = networkId.bscTestnet
-  const dstChains = [networkId.develop]
   const isFaucetAvailable = +config.chains[srcChain].faucet > 0
 
   // prev EthernalBridge
   const prevEthernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
+  const lastUid = await prevEthernalBridge.uid()
 
   // deploy new EthernalBridge
   const ethernalBridge = await deployContract(
     'EthernalBridge',
-    [config.chains[srcChain].xOracleMessage],
+    [config.chains[srcChain].xOracleMessage, lastUid],
     'EthernalBridge',
     deployer
   )
@@ -36,18 +36,6 @@ async function main() {
     )
   }
 
-  // set supported tokenIndexes for dstChain
-  for (let i = 0; i < dstChains.length; i++) {
-    const dstChain = dstChains[i]
-    for (let j = 0; j < config.chains[dstChain].vaultTokens.length; j++) {
-      const vaultToken = config.chains[dstChain].vaultTokens[j]
-      await sendTxn(
-        ethernalBridge.setSupportDstTokenIndex(dstChain, vaultToken.tokenIndex, true),
-        `ethernalBridge.setSupportDstTokenIndex(${dstChain}, ${vaultToken.tokenIndex}, true)`
-      )
-    }
-  }
-
   // set pair tokenIndex
   for (let i = 0; i < config.pairTokenIndexes.length; i++) {
     const pairTokenIndex = config.pairTokenIndexes[i]
@@ -60,11 +48,17 @@ async function main() {
   // set faucetFund
   if (isFaucetAvailable) {
     const faucetFund = await contractAt('FaucetFund', getContractAddress(`faucetFund`), deployer)
-    await sendTxn(ethernalBridge.setFaucetFund(faucetFund.address), `ethernalBridge.setFaucetFund(${faucetFund.address})`)
+    await sendTxn(
+      ethernalBridge.setFaucetFund(faucetFund.address),
+      `ethernalBridge.setFaucetFund(${faucetFund.address})`
+    )
     await sendTxn(faucetFund.addPool(ethernalBridge.address), `faucetFund.addPool(${ethernalBridge.address})`)
 
     // remove prevEthernalBridge
-    await sendTxn(faucetFund.removePool(prevEthernalBridge.address), `faucetFund.removePool(${prevEthernalBridge.address})`)
+    await sendTxn(
+      faucetFund.removePool(prevEthernalBridge.address),
+      `faucetFund.removePool(${prevEthernalBridge.address})`
+    )
   }
 }
 

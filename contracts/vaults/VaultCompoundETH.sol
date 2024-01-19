@@ -5,18 +5,19 @@ pragma solidity 0.8.19;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "../interfaces/IVault.sol";
-import "../interfaces/IERC20Mintable.sol";
+import "../interfaces/IVaultETH.sol";
+import "../interfaces/ICETH.sol";
 
-contract VaultMintable is IVault, Ownable, Pausable {
+contract VaultCompoundETH is IVaultETH, Ownable, Pausable {
     uint64 public immutable override chainId;
     uint256 public override tokenIndex;
     address public override reserveToken;
     uint256 public override minDeposit;
+    address public ibToken;
     address public controller;
 
     modifier onlyController() {
-        require(controller == msg.sender, "VaultMintable: caller is not the controller" );
+        require(controller == msg.sender, "VaultCompoundETH: caller is not the controller" );
         _;
     }
 
@@ -26,36 +27,39 @@ contract VaultMintable is IVault, Ownable, Pausable {
     event SetMinDeposit(uint256 minDeposit);
     event SetDepositPause(bool depositPause);
 
+    receive() external payable {}
+
     /**
      * @dev Constructor
      * @param _tokenIndex token index for reserve token
      * @param _reserveToken reserve token address
      * @param _minDeposit minimum deposit amount
+     * @param _ibToken venus ibToken address
      */
-    constructor(uint256 _tokenIndex, address _reserveToken, uint256 _minDeposit) {
+    constructor(uint256 _tokenIndex, address _reserveToken, uint256 _minDeposit, address _ibToken) {
         require(_reserveToken != address(0), "invalid address");
+        require(_ibToken != address(0), "invalid address");
 
         chainId = uint64(block.chainid);
         tokenIndex = _tokenIndex;
         reserveToken = _reserveToken;
         minDeposit = _minDeposit;
+        ibToken = _ibToken;
     }
 
     /**
      * @dev Call from EthernalBridge.send()
      * @param _from sender address
-     * @param _amount amount of ReserveToken
+     * - msg.value is amount of ReserveToken
      */
-    function deposit(address _from, uint256 _amount) external override onlyController whenNotPaused returns(uint256) {
-        uint256 balance = IERC20(reserveToken).balanceOf(address(this));
-        require(_amount > minDeposit, "amount too small");
-        require(balance >= _amount, "insufficient amount");
+    function deposit(address _from) external payable override onlyController whenNotPaused returns(uint256) {
+        require(msg.value > minDeposit, "amount too small");
 
-        // burn
-        IERC20Mintable(reserveToken).burn(address(this), _amount);
+        // mint
+        ICETH(ibToken).mint{ value: msg.value }();
 
-        emit Deposit(_from, _amount);
-        return _amount;
+        emit Deposit(_from, msg.value);
+        return msg.value;
     }
 
     /**
@@ -64,14 +68,20 @@ contract VaultMintable is IVault, Ownable, Pausable {
      * @param _amount amount of ReserveToken
      */
     function withdraw(address _to, uint256 _amount) external override onlyController {
-        // mint
-        IERC20Mintable(reserveToken).mint(_to, _amount);
+        uint256 balance = address(this).balance;
+
+        // burn
+        ICETH(ibToken).redeemUnderlying(_amount);
+        
+        uint256 reserveAmount = address(this).balance - balance;
+        payable(_to).transfer(reserveAmount);
 
         emit Withdraw(_to, _amount);
     }
 
     function totalBalance() external override view returns(uint256) {
-        return IERC20(reserveToken).balanceOf(address(this));
+        uint256 balance = IERC20(ibToken).balanceOf(address(this));
+        return (balance * ICETH(ibToken).exchangeRateStored()) / 1e18;
     }
 
     function depositPause() external override view returns(bool) {
@@ -79,7 +89,7 @@ contract VaultMintable is IVault, Ownable, Pausable {
     }
 
     function isVaultMintable() external override pure returns(bool) {
-        return true;
+        return false;
     }
 
     // ------------------------------
@@ -88,7 +98,7 @@ contract VaultMintable is IVault, Ownable, Pausable {
     function setController(address _controller) public onlyOwner() {
         require(_controller != address(0), "invalid address");
         controller = _controller;
-
+        
         emit SetController(_controller);
     }
 
@@ -104,7 +114,7 @@ contract VaultMintable is IVault, Ownable, Pausable {
         } else {
             _unpause();
         }
-        
+
         emit SetDepositPause(_flag);
     }
 }

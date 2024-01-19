@@ -71,6 +71,10 @@ contract VaultETH is IVaultETH {
 
     }
 
+    function isVaultMintable() external override pure returns(bool) {
+        return false;
+    }
+
     // ------------------------------
     // onlyOwner
     // ------------------------------

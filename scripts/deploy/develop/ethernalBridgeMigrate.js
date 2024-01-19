@@ -5,16 +5,16 @@ async function main() {
   let deployer = await getFrameSigner()
 
   const srcChain = networkId.develop
-  const dstChains = [networkId.bscTestnet]
   const isFaucetAvailable = +config.chains[srcChain].faucet > 0
 
   // prev EthernalBridge
   const prevEthernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
+  const lastUid = await prevEthernalBridge.uid()
 
   // deploy new EthernalBridge
   const ethernalBridge = await deployContract(
     'EthernalBridge',
-    [config.chains[srcChain].xOracleMessage],
+    [config.chains[srcChain].xOracleMessage, lastUid],
     'EthernalBridge',
     deployer
   )
@@ -39,18 +39,6 @@ async function main() {
       ethernalBridge.addAllowToken(tokenAddress, vault.address),
       `ethernalBridge.addAllowToken(${tokenAddress}, ${vault.address})`
     )
-  }
-
-  // set supported tokenIndexes for dstChain
-  for (let i = 0; i < dstChains.length; i++) {
-    const dstChain = dstChains[i]
-    for (let j = 0; j < config.chains[dstChain].vaultTokens.length; j++) {
-      const vaultToken = config.chains[dstChain].vaultTokens[j]
-      await sendTxn(
-        ethernalBridge.setSupportDstTokenIndex(dstChain, vaultToken.tokenIndex, true),
-        `ethernalBridge.setSupportDstTokenIndex(${dstChain}, ${vaultToken.tokenIndex}, true)`
-      )
-    }
   }
 
   // set pair tokenIndex
