@@ -17,6 +17,12 @@ async function main() {
 
       await sendTxn(vToken.setInterest(rate), `v${vaultToken.tokenName}.setInterest(${rate})`)
     }
+    else if (vaultToken.type == 'VaultVenusBNB') {
+      const vToken = await contractAt('VBNB', getContractAddress(`v${vaultToken.tokenName}`), deployer)
+      const rate = vaultToken.ibTokenRate
+
+      await sendTxn(vToken.setInterest(rate), `v${vaultToken.tokenName}.setInterest(${rate})`)
+    }
   }
 }
 
