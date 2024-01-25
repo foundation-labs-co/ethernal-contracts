@@ -51,7 +51,7 @@ describe("Vaults", function () {
         await ibTokenBNB.deployed();
 
         // Deploy Vault USDT - EUSDT
-        vaultMintableUSDT = await VaultMintable.deploy(tokenIndexes.USDT, usdt.address, expandDecimals(1, 18));
+        vaultMintableUSDT = await VaultMintable.deploy(tokenIndexes.USDT, usdt.address, expandDecimals(10, 18));
         await vaultMintableUSDT.deployed();
 
         vaultEthernalEUSDT = await VaultEthernal.deploy(tokenIndexes.EUSDT, usdt.address, expandDecimals(1, 18), eusdt.address);
@@ -112,7 +112,7 @@ describe("Vaults", function () {
 
         await vaultMintableUSDT.connect(deployer).setMinDeposit(expandDecimals(1, 18))
 
-        await expect(vaultMintableUSDT.connect(deployer).deposit(account2.address, amount))
+        await expect(vaultMintableUSDT.connect(deployer).deposit(account2.address, expandDecimals(1, 18)))
         .to.be.revertedWith("insufficient amount");
 
         await usdt.connect(deployer).setController(deployer.address, true);

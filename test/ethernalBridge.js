@@ -18,6 +18,7 @@ describe("Ethernal Bridge", function () {
     let vaultEthernalEUSDT
 
     const fee = expandDecimals(1,15); // 0.001 ETH
+    const lastUid = 0
 
     beforeEach(async function () {
 
@@ -43,7 +44,7 @@ describe("Ethernal Bridge", function () {
         await xOracleMessage.setFee(fee);
 
         // Deploy EthernalBridge
-        ethernalBridge = await EthernalBridgeContract.deploy(xOracleMessage.address);
+        ethernalBridge = await EthernalBridgeContract.deploy(xOracleMessage.address, lastUid);
         await ethernalBridge.deployed();
 
         // set pair tokenIndex
