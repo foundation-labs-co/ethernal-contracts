@@ -3,6 +3,7 @@ const { networkId, config } = require('../../../config')
 
 async function main() {
   let deployer = await getFrameSigner()
+  const interestPerBlock = 0;
   console.log('Deploying contracts with the account:', deployer.address)
 
   // ERC20Token
@@ -14,15 +15,11 @@ async function main() {
   })
   const usdt = await deployContract('ERC20Token', ['USDT (Ethernal)', 'USDT'], 'USDT', deployer)
   const usdc = await deployContract('ERC20Token', ['USDC (Ethernal)', 'USDC'], 'USDC', deployer)
-  // const btc = await getContractAddress(`btc`)
-  // const eth = await getContractAddress(`eth`)
-  // const usdt = await getContractAddress(`usdt`)
-  // const usdc = await getContractAddress(`usdc`)
 
   // ibToken
   const vbtc = await deployContract('VToken', ['Venus BTC', 'VBTC', getContractAddress('btc'), interestPerBlock], 'VBTC', deployer)
   const veth = await deployContract('VToken', ['Venus ETH', 'VETH', getContractAddress('eth'), interestPerBlock], 'VETH', deployer)
-  const vbnb = await deployContract('VBNB', ['Venus BNB', 'VBNB', 0], 'VBNB', deployer)
+  const vbnb = await deployContract('VBNB', ['Venus BNB', 'VBNB', interestPerBlock], 'VBNB', deployer)
   const vusdt = await deployContract('VToken', ['Venus USDT', 'VUSDT', getContractAddress('usdt'), interestPerBlock], 'VUSDT', deployer)
   const vusdc = await deployContract('VToken', ['Venus USDC', 'VUSDC', getContractAddress('usdc'), interestPerBlock], 'VUSDC', deployer)
 }
