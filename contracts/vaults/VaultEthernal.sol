@@ -59,7 +59,7 @@ contract VaultEthernal is IVault, Ownable, Pausable {
         uint256 reserveBalance = IERC20(reserveToken).balanceOf(address(this));
         IEthernalToken(ethernalToken).withdraw(_amount);
         uint256 reserveAmount = IERC20(reserveToken).balanceOf(address(this)) - reserveBalance;
-        require(reserveAmount > minDeposit, "amount too small");
+        require(reserveAmount >= minDeposit, "amount too small");
 
         // burn
         IERC20Mintable(reserveToken).burn(address(this), reserveAmount);

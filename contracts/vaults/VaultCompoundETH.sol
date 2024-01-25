@@ -53,7 +53,7 @@ contract VaultCompoundETH is IVaultETH, Ownable, Pausable {
      * - msg.value is amount of ReserveToken
      */
     function deposit(address _from) external payable override onlyController whenNotPaused returns(uint256) {
-        require(msg.value > minDeposit, "amount too small");
+        require(msg.value >= minDeposit, "amount too small");
 
         // mint
         ICETH(ibToken).mint{ value: msg.value }();

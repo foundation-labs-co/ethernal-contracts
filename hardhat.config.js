@@ -38,6 +38,7 @@ module.exports = {
       forking: {
         url: `https://data-seed-prebsc-1-s2.bnbchain.org:8545`,
       },
+      chainId: 97,
     },
     bsc: {
       url: `https://bsc-dataseed1.binance.org`,
