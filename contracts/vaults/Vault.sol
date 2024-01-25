@@ -48,7 +48,7 @@ contract VaultMintable is IVault, Ownable, Pausable {
      */
     function deposit(address _from, uint256 _amount) external override onlyController whenNotPaused returns(uint256) {
         uint256 balance = IERC20(reserveToken).balanceOf(address(this));
-        require(_amount > minDeposit, "amount too small");
+        require(_amount >= minDeposit, "amount too small");
         require(balance >= _amount, "insufficient amount");
 
         // burn
