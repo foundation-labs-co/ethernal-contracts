@@ -27,14 +27,19 @@ const config = {
   pairTokenIndexes: [
     [tokenIndexes.BTC, tokenIndexes.BTC],
     [tokenIndexes.BTC, tokenIndexes.EBTC],
+    [tokenIndexes.EBTC, tokenIndexes.EBTC],
     [tokenIndexes.ETH, tokenIndexes.ETH],
     [tokenIndexes.ETH, tokenIndexes.EETH],
+    [tokenIndexes.EETH, tokenIndexes.EETH],
     [tokenIndexes.BNB, tokenIndexes.BNB],
     [tokenIndexes.BNB, tokenIndexes.EBNB],
+    [tokenIndexes.EBNB, tokenIndexes.EBNB],
     [tokenIndexes.USDT, tokenIndexes.USDT],
     [tokenIndexes.USDT, tokenIndexes.EUSDT],
+    [tokenIndexes.EUSDT, tokenIndexes.EUSDT],
     [tokenIndexes.USDC, tokenIndexes.USDC],
     [tokenIndexes.USDC, tokenIndexes.EUSDC],
+    [tokenIndexes.EUSDC, tokenIndexes.EUSDC],
   ]
 }
 

@@ -15,6 +15,7 @@ async function main() {
     'EthernalBridge',
     deployer
   )
+  // const ethernalBridge = await contractAt('EthernalBridge', getContractAddress('ethernalBridge'), deployer)
 
   // deploy Vaults
   for (let i = 0; i < config.chains[srcChain].vaultTokens.length; i++) {
